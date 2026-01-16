@@ -1,126 +1,109 @@
 # Swiss Tournament Tracker
 
-A web application for tracking Magic: The Gathering tournaments using Swiss pairing (3 wins to advance, 3 losses to eliminate).
+> A modern, feature-rich web application for managing Swiss-system tournaments. Perfect for Magic: The Gathering, board game leagues, esports events, and any competitive tournament format.
 
-## Files
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0-green.svg)
+![Browser](https://img.shields.io/badge/platform-web-orange.svg)
 
-- **index.html** - Main HTML structure (English version)
-- **styles.css** - All CSS styling separated for maintainability
-- **app.js** - Application logic and state management
-- **index.backup.html** - Backup of original Portuguese version (fully functional)
+## ✨ Why Swiss Tournament Tracker?
 
-## What Changed
+**Zero Setup Required** • **Works Offline** • **No Account Needed** • **100% Free**
 
-### ✅ Translation (Portuguese → English)
-- All UI text, buttons, and messages translated
-- Headers, labels, placeholders updated
-- Alert/confirm messages in English
-- Log entries now in English format
+Built for tournament organizers who need a reliable, professional tool without the hassle of complex software or subscriptions. Open `index.html` in any browser and you're ready to run a tournament in seconds.
 
-### ✅ Layout Improvements
-Fixed button layout issues with long deck names:
-- Buttons now use `white-space: nowrap` to prevent text wrapping
-- Added `word-break: break-word` to deck names for proper wrapping
-- Improved flex layout with better min/max widths
-- Controls section now uses `flex-shrink: 0` to maintain button integrity
-- Better responsive behavior on mobile/smaller screens
+## 🚀 Quick Start
 
-### ✅ Code Organization (Best Practices)
-Reorganized monolithic HTML into modular structure:
-- **Separation of Concerns**: CSS, JS, and HTML in separate files
-- **Maintainability**: Easier to edit and debug individual components
-- **Readability**: Clear file structure with comments
-- **Atomicity**: Each file has a single responsibility
-
-## How to Run
-
-### 🖥️ Local (Single Computer)
-1. Open `index.html` in your browser (Chrome, Firefox, Edge)
-2. The app uses localStorage to persist data
-
-### 📱 Network Access (Phone, Tablet, Multiple Computers)
-
-**Easiest Method - Auto Script:**
 ```bash
-# From the project root directory
+# Option 1: Open locally
+Double-click index.html
+
+# Option 2: Run on network (multiple devices)
 ./scripts/start-server.sh
 ```
 
-**Manual Method:**
-```bash
-# Start server
-python3 -m http.server 8080
+**That's it!** Your tournament tracker is running.
 
-# Find your IP
-ifconfig | grep "inet " | grep -v 127.0.0.1
+## 🎯 Core Features
 
-# Access from other devices
-http://YOUR-IP:8080
-```
+### Tournament Management
+- **Swiss Pairing Algorithm** with intelligent tiebreakers (Strength of Schedule)
+- **Configurable Format**: Choose wins/losses needed and match formats (BO1/BO3/BO5/BO7)
+- **Automatic BYE Handling** for odd player counts
+- **Top 4/8 Playoff Brackets** with performance-based seeding
 
-📖 **See [NETWORK-GUIDE.md](docs/NETWORK-GUIDE.md) for detailed instructions**
+### Real-Time Tracking
+- **Interactive Match Cards**: Click to record winners
+- **Live Statistics**: Win rates, head-to-head records, opponent strength
+- **Round Timer** with customizable presets and audio alerts
+- **Auto-Save**: All data persists automatically in your browser
 
-### 🌐 GitHub Pages (Access from Anywhere)
-1. Push to GitHub
-2. Enable Pages in Settings → Pages → Source: main branch
-3. Access: `https://your-username.github.io/swiss/`
+### Professional Features
+- **📊 Interactive Analytics**: Full-screen charts with deck filtering and custom colors
+- **📜 Round History**: Navigate and review all previous rounds
+- **🏆 Tournament Archive**: Save, load, and compare multiple tournaments
+- **🖥️ Presentation Mode**: Optimized for projectors and large displays
 
-✨ **Ready for GitHub Pages - zero configuration needed!**
+### Data Management
+- **Export/Import**: JSON backup with timestamps
+- **Tournament Comparison**: Analyze performance across events
+- **Reset Options**: Clear rounds while keeping participants
 
-## Features
+## 📱 Multi-Device Support
 
-### Core Features
-- Swiss pairing algorithm with tiebreaker (Strength of Schedule)
-- **🎲 Randomized Round 1**: First round pairings are randomized (subsequent rounds use Swiss logic)
-- Automatic BO3 detection for decisive matches
-- Win/loss tracking with automatic advancement/elimination
-- Top 4/8 bracket builder (seeded by performance)
-- JSON export/import/download for backup
-- Activity log
-- BYE handling for odd number of decks
-- **Reset Tournament**: Clear rounds/bracket but keep decks (perfect for consecutive tournaments)
+Access from **any device** on your network:
+- 🖥️ Desktop/Laptop (tournament organizer)
+- 📱 Phone/Tablet (viewing live standings)
+- 📺 TV/Projector (presentation mode)
 
-### Enhanced Features ✨
-- **Toast Notifications**: Real-time visual feedback for all actions
-- **Auto-save Indicator**: Live saving status display (bottom-right corner)
-- **Expanded Statistics**: Win rate, opponent win rate, and detailed SoS
-  - Hover over 📊 icon to see detailed stats for each deck
-- **Visual Button Feedback**: Success animations when recording results
-- **Download Backup**: Direct JSON file download with timestamp
+Each device maintains its own data via localStorage. Share tournament state using export/import.
 
-### Premium Features 🎯
-- **⏱️ Round Timer**: Customizable timer with presets (30/45/60/90 min)
-  - Start, pause, reset controls
-  - Visual alerts when time expires
-  - Audio notification
-- **📜 Round History**: Navigate through past rounds
-  - View all previous pairings and results
-  - Quick navigation with arrow buttons
-- **🏆 Tournament Archive**: Save and compare multiple tournaments
-  - Save current tournament with custom name
-  - Load previous tournaments
-  - Compare statistics across tournaments
-- **🖥️ Presentation Mode**: Optimized display for projectors
-  - Grid layout with multiple matches visible side-by-side
-  - Larger fonts and spacing for readability from distance
-  - Cleaner layout for visibility
-  - Keyboard shortcuts (F11 or Ctrl+Shift+P)
-- **🎨 Enhanced Bracket Visualization**: Beautiful playoff bracket display
-  - **Replaces Swiss view**: Bracket takes over the main panel when built
-  - **Single-round view**: Shows one round at a time (no scrolling!)
-  - **Round navigation**: Navigate between rounds with arrow buttons
-  - **Seeded by performance**: #1 vs #8, #2 vs #7, etc.
-  - Card-based match view with seeds
-  - Winner highlighting with animations
-  - Trophy display for champion
-  - Easy toggle back to Swiss rounds
+## 🎨 Beautiful, Modern Interface
 
-## Browser Support
+- **Dark Theme** optimized for long tournament sessions
+- **Responsive Design** works on any screen size
+- **Smooth Animations** for professional feel
+- **Toast Notifications** for instant feedback
+- **Color-Coded Status** for at-a-glance information
 
-Works in all modern browsers:
-- Chrome/Edge (recommended)
-- Firefox
-- Safari
-- Opera
+## 📚 Documentation
 
-No server required - runs entirely in the browser!
+- **[Quick Start Guide](docs/QUICKSTART.md)** - Get running in 5 minutes
+- **[Network Setup](docs/NETWORK-GUIDE.md)** - Multi-device access
+- **[Feature Guide](docs/FEATURES.md)** - Complete feature walkthrough
+- **[Analytics Guide](docs/ANALYTICS-INTERACTIVE.md)** - Interactive charts
+
+## 🎮 Perfect For
+
+- **Magic: The Gathering** tournaments (LGS, Commander leagues)
+- **Board Game** competitions and leagues
+- **Esports** qualifiers and regional events
+- **Any Swiss-format** competition (chess, card games, etc.)
+
+## 💡 Technical Highlights
+
+- **100% Client-Side**: No server required, no data sent anywhere
+- **Zero Dependencies**: Pure HTML/CSS/JavaScript
+- **Lightweight**: Fast loading, runs on any device
+- **Privacy First**: All data stays on your device
+- **Works Offline**: No internet connection needed
+
+## 🌟 Use Cases
+
+**Local Game Store**: Run weekly Magic tournaments with professional tools.
+
+**Tournament Series**: Archive and compare performance across multiple events.
+
+**Remote Viewing**: Players check standings from their phones while you manage from the main desk.
+
+**Large Events**: Use presentation mode on a TV for the whole venue to see live standings.
+
+## 🔄 Updates & Support
+
+This project is actively maintained. For issues, feature requests, or contributions, please visit the [GitHub repository](https://github.com/paulocezarvjr/swiss-tournament-tracker).
+
+---
+
+**Built with ❤️ for the tournament community**
+
+*Compatible with Chrome, Firefox, Safari, and Edge • No installation required*
