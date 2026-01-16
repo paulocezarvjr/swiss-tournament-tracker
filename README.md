@@ -42,8 +42,8 @@ Reorganized monolithic HTML into modular structure:
 
 **Easiest Method - Auto Script:**
 ```bash
-cd /Users/paulo-olibra/swiss
-./start-server.sh
+# From the project root directory
+./scripts/start-server.sh
 ```
 
 **Manual Method:**
