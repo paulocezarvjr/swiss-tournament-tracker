@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Swiss Tournament Tracker (3W/3L)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>Swiss Tournament Tracker (3W/3L)</h1>
+  <div class="sub">
+    Deck advances with <b>3 wins</b>, is eliminated with <b>3 losses</b>. Normal matches are <b>BO3</b>. Decisive matches (someone can reach 3-x or x-3) are <b>BO5</b>.
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <!-- LEFT PANEL -->
+    <section class="card left-panel">
+      <!-- Round History Navigator -->
+      <div class="history-nav" id="historyNav" style="display: none;">
+        <div class="row" style="justify-content: space-between;">
+          <div class="round-selector">
+            <button id="btnHistoryPrev">◀</button>
+            <select id="historyRoundSelect"></select>
+            <button id="btnHistoryNext">▶</button>
+          </div>
+          <button id="btnCloseHistory">✕ Close</button>
+        </div>
+        <div class="history-content" id="historyContent"></div>
+      </div>
+
+      <!-- Swiss Rounds Section -->
+      <div id="swissSection">
+        <h2>Current Round</h2>
+        <div class="row" style="justify-content:space-between; align-items:flex-start;">
+          <div class="kpi">
+            <div class="k"><div class="n" id="kRound">0</div><div class="l">Round</div></div>
+            <div class="k"><div class="n" id="kActive">0</div><div class="l">Active Decks</div></div>
+            <div class="k"><div class="n" id="kAdv">0</div><div class="l">Advanced (3W)</div></div>
+            <div class="k"><div class="n" id="kElim">0</div><div class="l">Eliminated (3L)</div></div>
+          </div>
+
+          <div class="row" style="justify-content:flex-end;">
+            <button class="primary" id="btnNextRound">Generate next round</button>
+            <button class="warn" id="btnUndoRound">Undo last round</button>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div id="pairsWrap" class="pairs"></div>
+
+        <div class="sep"></div>
+        <div class="row" style="justify-content:space-between;">
+          <div class="hint">
+            Tip: Normal matches are BO3. When it becomes "decisive" (can reach 3-x or x-3), the app automatically marks it as BO5.
+          </div>
+          <div class="row">
+            <button id="btnAutoFinish" title="Marks as BYE if there's an odd deck in any round">Apply auto BYE</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playoff Bracket Section (replaces Swiss when active) -->
+      <div id="playoffSection" style="display: none;">
+        <div class="row" style="justify-content:space-between; align-items:center; margin-bottom: 14px;">
+          <h2 style="margin: 0;">🏆 Playoff Bracket</h2>
+          <button id="btnCloseBracket" class="warn">← Back to Swiss</button>
+        </div>
+        <div id="bracketWrap" class="bracket"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL - TABS SYSTEM -->
+    <aside class="card">
+      <!-- Tab Navigation -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="tournament">
+          <span class="tab-icon">🏆</span>
+          <span class="tab-label">Tournament</span>
+        </button>
+        <button class="tab-btn" data-tab="analytics" id="btnOpenAnalytics">
+          <span class="tab-icon">📈</span>
+          <span class="tab-label">Analytics</span>
+        </button>
+        <button class="tab-btn" data-tab="tools">
+          <span class="tab-icon">⚙️</span>
+          <span class="tab-label">Tools</span>
+        </button>
+      </div>
+
+      <!-- Tab Content Container -->
+      <div class="tabs-content">
+        
+        <!-- ============================================
+             TAB 1: TOURNAMENT
+             ============================================ -->
+        <div class="tab-pane active" id="tab-tournament">
+          <h2>Decks & Configuration</h2>
+
+          <div class="row" style="width:100%;">
+            <div style="flex:1; min-width:240px;">
+              <label class="small">Deck name</label>
+              <input id="deckName" placeholder="E.g.: Burn Pauper / Azorius Control / Elves..." />
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-end;">
+              <button class="primary" id="btnAddDeck">Add deck</button>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="row" style="justify-content:space-between; align-items:center;">
+            <span class="pill" id="statusPill">Status: empty</span>
+            <div class="row">
+              <button id="btnSeedExample">Fill example (20)</button>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <h2 style="margin-top:0;">Standings</h2>
+          <div style="max-height:400px; overflow:auto; border-radius:12px; border:1px solid #1f2a3b;">
+            <table id="decksTable">
+              <thead>
+                <tr>
+                  <th>Deck</th>
+                  <th class="right">W-L</th>
+                  <th>Status</th>
+                  <th class="right">Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="sep"></div>
+
+          <h2>Playoff Bracket</h2>
+          <div class="row">
+            <select id="bracketSize">
+              <option value="4">Top 4</option>
+              <option value="8" selected>Top 8</option>
+            </select>
+            <button class="primary" id="btnBuildBracket">Build bracket</button>
+            <button id="btnSimBracket">Simulate</button>
+          </div>
+          <div class="hint" style="margin-top:8px;">
+            Bracket uses performance seeding (#1 vs #8, etc.) and appears on the left panel.
+          </div>
+
+          <div class="sep"></div>
+          <h2>Activity Log</h2>
+          <div id="log" class="log"></div>
+        </div>
+
+        <!-- ============================================
+             TAB 2: ANALYTICS (NEW!)
+             ============================================ -->
+        <div class="tab-pane" id="tab-analytics">
+          <h2>Performance Analytics</h2>
+          
+          <div class="analytics-grid">
+            <!-- Win Rate Chart -->
+            <div class="chart-card">
+              <h3>📊 Win Rate by Deck</h3>
+              <div id="chartWinRate" class="chart-container"></div>
+            </div>
+
+            <!-- Progress Chart -->
+            <div class="chart-card">
+              <h3>📈 Wins Progression</h3>
+              <div id="chartProgress" class="chart-container"></div>
+            </div>
+
+            <!-- Status Distribution -->
+            <div class="chart-card">
+              <h3>🎯 Status Distribution</h3>
+              <div id="chartStatus" class="chart-container"></div>
+            </div>
+
+            <!-- Head to Head -->
+            <div class="chart-card full-width">
+              <h3>🔥 Head-to-Head Matrix</h3>
+              <div id="chartHeadToHead" class="chart-container"></div>
+            </div>
+
+            <!-- Top Performers -->
+            <div class="chart-card full-width">
+              <h3>🏆 Top Performers</h3>
+              <div id="leaderboard" class="leaderboard"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================
+             TAB 3: TOOLS
+             ============================================ -->
+        <div class="tab-pane" id="tab-tools">
+          <h2>Tournament Tools</h2>
+
+          <!-- Round Timer -->
+          <details class="tool-section">
+            <summary>⏱️ Round Timer</summary>
+            <div class="timer-widget-compact" id="timerWidget">
+              <div class="timer-display" id="timerDisplay">00:00</div>
+              <div class="timer-controls">
+                <button class="primary" id="btnTimerStart">Start</button>
+                <button class="warn" id="btnTimerPause">Pause</button>
+                <button id="btnTimerReset">Reset</button>
+              </div>
+              <div class="timer-presets">
+                <button data-minutes="30">30m</button>
+                <button data-minutes="45">45m</button>
+                <button data-minutes="60">60m</button>
+                <button data-minutes="90">90m</button>
+              </div>
+            </div>
+          </details>
+
+          <div class="sep"></div>
+
+          <!-- History -->
+          <details class="tool-section">
+            <summary>📜 Round History</summary>
+            <div class="tool-content">
+              <button id="btnViewHistory" class="primary" style="width:100%;">View Round History</button>
+              <p class="hint" style="margin-top:8px;">Browse through all previous rounds and their results.</p>
+            </div>
+          </details>
+
+          <div class="sep"></div>
+
+          <!-- Tournament Archive -->
+          <details class="tool-section">
+            <summary>🏆 Tournament Archive</summary>
+            <div class="archive-section">
+              <div class="row" style="justify-content: space-between; align-items: center; margin-bottom:10px;">
+                <div class="row">
+                  <button class="primary" id="btnSaveTournament">Save Current</button>
+                  <button id="btnCompare">Compare</button>
+                </div>
+              </div>
+              <div class="tournament-list" id="tournamentList"></div>
+            </div>
+          </details>
+
+          <!-- Comparison View (hidden by default) -->
+          <div id="comparisonView" style="display: none;">
+            <div class="sep"></div>
+            <div class="row" style="justify-content: space-between; align-items: center;">
+              <h3 style="margin: 0;">📊 Tournament Comparison</h3>
+              <button id="btnCloseComparison">Close</button>
+            </div>
+            <div class="comparison-grid" id="comparisonGrid"></div>
+          </div>
+
+          <div class="sep"></div>
+
+          <!-- Backup/Export -->
+          <details class="tool-section">
+            <summary>💾 Backup & Export</summary>
+            <div class="tool-content">
+              <div class="row">
+                <button id="btnExport">Export JSON</button>
+                <button id="btnDownload">Download</button>
+                <button id="btnImport">Import</button>
+              </div>
+              <textarea id="jsonBox" rows="6" style="width:100%; margin-top:10px;" placeholder="Export appears here. To import, paste and click Import."></textarea>
+            </div>
+          </details>
+
+          <div class="sep"></div>
+
+          <!-- Reset Options -->
+          <details class="tool-section">
+            <summary>🔄 Reset Options</summary>
+            <div class="tool-content">
+              <button class="warn" id="btnResetTournament" style="width:100%; margin-bottom:8px;">Reset Tournament (Keep Decks)</button>
+              <button class="danger" id="btnResetAll" style="width:100%;">Reset Everything</button>
+              <p class="hint" style="margin-top:8px;">Reset Tournament clears rounds/bracket but keeps decks.</p>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<!-- Toast Notifications Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Auto-save Indicator -->
+<div class="save-indicator" id="saveIndicator">
+  <div class="spinner"></div>
+  <span class="text">Saving...</span>
+</div>
+
+<!-- Presentation Mode Toggle -->
+<div class="presentation-toggle" id="presentationToggle">
+  <span id="presentationIcon">🖥️</span>
+  <span id="presentationText">Presentation Mode</span>
+</div>
+
+<!-- Analytics Fullscreen Mode -->
+<div class="analytics-fullscreen" id="analyticsFullscreen" style="display: none;">
+  <div class="analytics-header">
+    <div class="analytics-title">
+      <h1>📊 Performance Analytics</h1>
+      <p class="analytics-subtitle">Interactive tournament statistics and visualizations</p>
+    </div>
+    <button class="analytics-close" id="btnCloseAnalytics">✕ Close</button>
+  </div>
+
+  <div class="analytics-controls">
+    <div class="deck-selector">
+      <h3>Select Decks to Display:</h3>
+      <div class="deck-chips" id="deckChips"></div>
+    </div>
+    <div class="chart-options">
+      <label>
+        <input type="checkbox" id="showWinRate" checked> Win Rate Chart
+      </label>
+      <label>
+        <input type="checkbox" id="showProgress" checked> Progress Chart
+      </label>
+      <label>
+        <input type="checkbox" id="showHeadToHead" checked> Head-to-Head
+      </label>
+    </div>
+  </div>
+
+  <div class="analytics-main">
+    <!-- Large Charts -->
+    <div class="chart-large" id="chartWinRateLarge" style="display: none;"></div>
+    <div class="chart-large" id="chartProgressLarge" style="display: none;"></div>
+    <div class="chart-large" id="chartHeadToHeadLarge" style="display: none;"></div>
+    
+    <!-- Stats Summary -->
+    <div class="stats-summary" id="statsSummary"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+
+<!--
+HOW TO RUN LOCALLY AT THE OFFICE
+1) Save these files (index.html, styles.css, app.js) in the same folder.
+2) Open with double-click (Chrome/Edge/Firefox).
+3) If you want it on the network/local with URL:
+   - On the PC that will "host", open terminal in the folder and run:
+     python -m http.server 8080
+   - On another PC in the network, access: http://PC_IP:8080/
+-->
+</body>
+</html>

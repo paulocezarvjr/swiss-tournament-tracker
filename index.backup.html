@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Campeonato de Decks (Suíço 3W/3L)</title>
+  <style>
+    :root{ --bg:#0b0f14; --card:#121824; --muted:#9fb0c0; --text:#e9f1f8; --line:#233041; --good:#2dd4bf; --bad:#fb7185; --warn:#fbbf24; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:linear-gradient(180deg,#0b0f14,#0a0d12); color:var(--text); }
+    header{ padding:18px 18px 10px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(11,15,20,.92); backdrop-filter: blur(10px); z-index:10; }
+    header h1{ margin:0; font-size:18px; letter-spacing:.2px; }
+    header .sub{ margin-top:6px; color:var(--muted); font-size:13px; }
+    main{ padding:18px; max-width:1200px; margin:0 auto; }
+    .grid{ display:grid; gap:14px; grid-template-columns: 1.15fr .85fr; }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+    .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; }
+    .card h2{ margin:0 0 10px; font-size:14px; color:#d6e5f3; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    input, button, select, textarea{
+      font:inherit; color:var(--text); background:#0b1220; border:1px solid #263449;
+      border-radius:10px; padding:9px 10px;
+    }
+    input:focus, select:focus, textarea:focus{ outline:2px solid rgba(45,212,191,.25); border-color: rgba(45,212,191,.55); }
+    button{ cursor:pointer; background:#0e1730; }
+    button:hover{ border-color:#3b536e; }
+    button.primary{ background:rgba(45,212,191,.18); border-color:rgba(45,212,191,.55); }
+    button.danger{ background:rgba(251,113,133,.12); border-color:rgba(251,113,133,.5); }
+    button.warn{ background:rgba(251,191,36,.12); border-color:rgba(251,191,36,.5); }
+    .pill{ display:inline-flex; gap:6px; align-items:center; padding:2px 10px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:12px; }
+    .pill.good{ border-color:rgba(45,212,191,.55); color:#bff7ee; background:rgba(45,212,191,.08); }
+    .pill.bad{ border-color:rgba(251,113,133,.5); color:#ffd2da; background:rgba(251,113,133,.08); }
+    .pill.warn{ border-color:rgba(251,191,36,.55); color:#ffe7b0; background:rgba(251,191,36,.08); }
+    .muted{ color:var(--muted); font-size:12px; }
+    .sep{ height:1px; background:var(--line); margin:12px 0; }
+    table{ width:100%; border-collapse:collapse; }
+    th, td{ border-bottom:1px solid #1c2736; padding:9px 8px; vertical-align:top; text-align:left; }
+    th{ font-size:12px; color:var(--muted); font-weight:600; }
+    td{ font-size:13px; }
+    .right{ text-align:right; }
+    .small{ font-size:12px; color:var(--muted); }
+    .pairs{ display:grid; gap:10px; }
+    .pair{
+      border:1px solid #1f2a3b; border-radius:14px; padding:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+    }
+    .pair .top{ display:flex; justify-content:space-between; gap:10px; align-items:center; }
+    .pair .names{ display:flex; flex-direction:column; gap:4px; }
+    .pair .names b{ font-size:14px; }
+    .pair .names span{ font-size:12px; color:var(--muted); }
+    .pair .controls{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .badge{ font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); }
+    .badge.bo3{ border-color:rgba(251,191,36,.55); color:#ffe7b0; background:rgba(251,191,36,.08); }
+    .badge.bo1{ border-color:rgba(159,176,192,.35); background:rgba(159,176,192,.05); }
+    .log{ white-space:pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New"; font-size:12px; color:#cfe0f0; background:#0a101b; border:1px solid #1f2a3b; border-radius:12px; padding:10px; max-height:220px; overflow:auto; }
+    .kpi{ display:flex; gap:10px; flex-wrap:wrap; }
+    .kpi .k{ padding:8px 10px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.02); }
+    .k .n{ font-size:16px; font-weight:700; }
+    .k .l{ font-size:12px; color:var(--muted); }
+    .bracket{ display:grid; gap:10px; grid-template-columns:1fr; }
+    .bracket .match{ border:1px solid #1f2a3b; border-radius:14px; padding:12px; }
+    .match .line{ display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px dashed #1c2736; }
+    .match .line:last-child{ border-bottom:none; }
+    .winner{ color:#bff7ee; font-weight:700; }
+    .loser{ color:#ffd2da; }
+    .hint{ font-size:12px; color:var(--muted); line-height:1.35; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Campeonato de Decks (Suíço 3W/3L)</h1>
+  <div class="sub">
+    Deck avança com <b>3 vitórias</b>, cai com <b>3 derrotas</b>. Partida decisiva (alguém pode virar 3-x ou x-3) é <b>BO3</b>.
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <!-- ESQUERDA -->
+    <section class="card">
+      <h2>Rodada atual</h2>
+      <div class="row" style="justify-content:space-between; align-items:flex-start;">
+        <div class="kpi">
+          <div class="k"><div class="n" id="kRound">0</div><div class="l">Rodada</div></div>
+          <div class="k"><div class="n" id="kActive">0</div><div class="l">Decks ativos</div></div>
+          <div class="k"><div class="n" id="kAdv">0</div><div class="l">Classificados (3W)</div></div>
+          <div class="k"><div class="n" id="kElim">0</div><div class="l">Eliminados (3L)</div></div>
+        </div>
+
+        <div class="row" style="justify-content:flex-end;">
+          <button class="primary" id="btnNextRound">Gerar próxima rodada</button>
+          <button class="warn" id="btnUndoRound">Desfazer última rodada</button>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div id="pairsWrap" class="pairs"></div>
+
+      <div class="sep"></div>
+      <div class="row" style="justify-content:space-between;">
+        <div class="hint">
+          Dica: partidas não decisivas podem ser BO1. Quando virar "decisiva", o app marca como BO3 automaticamente.
+        </div>
+        <div class="row">
+          <button id="btnAutoFinish" title="Marca como bye se sobrar deck ímpar em alguma rodada">Aplicar BYE automático</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIREITA -->
+    <aside class="card">
+      <h2>Decks e configuração</h2>
+
+      <div class="row" style="width:100%;">
+        <div style="flex:1; min-width:240px;">
+          <label class="small">Nome do deck</label>
+          <input id="deckName" placeholder="Ex: Burn Pauper / Azorius Control / Elfos..." />
+        </div>
+        <div style="display:flex; gap:10px; align-items:flex-end;">
+          <button class="primary" id="btnAddDeck">Adicionar deck</button>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <span class="pill" id="statusPill">Estado: vazio</span>
+        <div class="row">
+          <button id="btnSeedExample">Preencher exemplo (20)</button>
+          <button class="danger" id="btnResetAll">Resetar tudo</button>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <h2 style="margin-top:0;">Tabela (score e status)</h2>
+      <div style="max-height:360px; overflow:auto; border-radius:12px; border:1px solid #1f2a3b;">
+        <table id="decksTable">
+          <thead>
+            <tr>
+              <th>Deck</th>
+              <th class="right">W-L</th>
+              <th>Estado</th>
+              <th class="right">Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="sep"></div>
+
+      <h2>Chave (Top 4 / Top 8)</h2>
+      <div class="row">
+        <select id="bracketSize">
+          <option value="4">Top 4</option>
+          <option value="8" selected>Top 8</option>
+        </select>
+        <button class="primary" id="btnBuildBracket">Montar chave</button>
+        <button id="btnSimBracket">Simular chave (aleatório)</button>
+      </div>
+      <div class="hint" style="margin-top:8px;">
+        A chave usa os melhores por desempenho (W maior, depois menor L, depois desempate simples por “força de agenda”).
+      </div>
+      <div class="sep"></div>
+      <div id="bracketWrap" class="bracket"></div>
+
+      <div class="sep"></div>
+
+      <h2>Backup</h2>
+      <div class="row">
+        <button id="btnExport">Exportar JSON</button>
+        <button id="btnImport">Importar JSON</button>
+      </div>
+      <textarea id="jsonBox" rows="6" style="width:100%; margin-top:10px;" placeholder="Export aparece aqui. Para importar, cole aqui e clique em Importar."></textarea>
+
+      <div class="sep"></div>
+      <h2>Log</h2>
+      <div id="log" class="log"></div>
+    </aside>
+
+  </div>
+</main>
+
+<script>
+(() => {
+  // =========================
+  // Storage + State
+  // =========================
+  const LS_KEY = "swiss_decks_3w3l_v1";
+
+  /** @typedef {{
+   *  id: string,
+   *  name: string,
+   *  wins: number,
+   *  losses: number,
+   *  status: 'active'|'advanced'|'eliminated',
+   *  opponents: string[],
+   *  byeCount: number
+   * }} Deck */
+
+  /** @typedef {{
+   *  round: number,
+   *  pairs: Array<{
+   *    id: string,
+   *    a: string,
+   *    b: string|null,
+   *    format: 'BO1'|'BO3',
+   *    result: 'A'|'B'|'BYE'|null
+   *  }>,
+   *  createdAt: number
+   * }} Round */
+
+  /** @typedef {{
+   *  decks: Deck[],
+   *  rounds: Round[],
+   *  bracket: any|null,
+   *  log: string[]
+   * }} AppState */
+
+  /** @type {AppState} */
+  let state = load() ?? {
+    decks: [],
+    rounds: [],
+    bracket: null,
+    log: []
+  };
+
+  // =========================
+  // DOM
+  // =========================
+  const $ = (sel) => document.querySelector(sel);
+
+  const deckName = $("#deckName");
+  const btnAddDeck = $("#btnAddDeck");
+  const btnSeedExample = $("#btnSeedExample");
+  const btnResetAll = $("#btnResetAll");
+
+  const btnNextRound = $("#btnNextRound");
+  const btnUndoRound = $("#btnUndoRound");
+  const btnAutoFinish = $("#btnAutoFinish");
+
+  const pairsWrap = $("#pairsWrap");
+  const decksTable = $("#decksTable tbody");
+  const statusPill = $("#statusPill");
+
+  const kRound = $("#kRound");
+  const kActive = $("#kActive");
+  const kAdv = $("#kAdv");
+  const kElim = $("#kElim");
+
+  const bracketSize = $("#bracketSize");
+  const btnBuildBracket = $("#btnBuildBracket");
+  const btnSimBracket = $("#btnSimBracket");
+  const bracketWrap = $("#bracketWrap");
+
+  const btnExport = $("#btnExport");
+  const btnImport = $("#btnImport");
+  const jsonBox = $("#jsonBox");
+
+  const logEl = $("#log");
+
+  // =========================
+  // Helpers
+  // =========================
+  const uid = () => Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+  const now = () => Date.now();
+
+  function save() {
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  function log(msg) {
+    const stamp = new Date().toLocaleString("pt-BR");
+    state.log.push(`[${stamp}] ${msg}`);
+    if (state.log.length > 200) state.log.shift();
+    save();
+    renderLog();
+  }
+
+  function clampStatus(deck) {
+    if (deck.wins >= 3) deck.status = "advanced";
+    else if (deck.losses >= 3) deck.status = "eliminated";
+    else deck.status = "active";
+  }
+
+  function getDeck(id) {
+    return state.decks.find(d => d.id === id) || null;
+  }
+
+  function isActive(deck) {
+    return deck.status === "active";
+  }
+
+  // decisiva se alguém pode fechar 3W ou cair na 3ª derrota
+  function isDecisive(a, b) {
+    const da = getDeck(a);
+    const db = b ? getDeck(b) : null;
+    if (!da) return false;
+    const aDec = (da.wins === 2 || da.losses === 2);
+    const bDec = db ? (db.wins === 2 || db.losses === 2) : false;
+    return aDec || bDec;
+  }
+
+  // Força de agenda (desempate simples): soma das vitórias dos oponentes
+  function sos(deck) {
+    let s = 0;
+    for (const oid of deck.opponents) {
+      const od = getDeck(oid);
+      if (od) s += od.wins;
+    }
+    return s;
+  }
+
+  function sortedDecksForTable() {
+    const copy = [...state.decks];
+    copy.sort((x, y) => {
+      // advanced primeiro? melhor só ordenar por desempenho
+      if (y.wins !== x.wins) return y.wins - x.wins;
+      if (x.losses !== y.losses) return x.losses - y.losses;
+      const sx = sos(x), sy = sos(y);
+      if (sy !== sx) return sy - sx;
+      return x.name.localeCompare(y.name);
+    });
+    return copy;
+  }
+
+  function activeDecks() {
+    return state.decks.filter(d => d.status === "active");
+  }
+
+  function canGenerateRound() {
+    return activeDecks().length >= 2;
+  }
+
+  function lastRound() {
+    if (state.rounds.length === 0) return null;
+    return state.rounds[state.rounds.length - 1];
+  }
+
+  // Check se round atual está completo (todos pares com resultado)
+  function currentRoundComplete() {
+    const r = lastRound();
+    if (!r) return true;
+    return r.pairs.every(p => p.result !== null);
+  }
+
+  // =========================
+  // Pairing (Swiss)
+  // =========================
+  function makeSwissPairs() {
+    // Pré-condição: round anterior completo ou não existe
+    if (!currentRoundComplete()) {
+      alert("Finalize os resultados da rodada atual antes de gerar a próxima.");
+      return null;
+    }
+
+    const act = activeDecks();
+    if (act.length < 2) {
+      alert("Não há decks ativos suficientes para parear.");
+      return null;
+    }
+
+    // Agrupar por (wins, losses) como score group
+    // Ordena por desempenho geral + SoS para estabilidade
+    const ordered = [...act].sort((a,b) => {
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      if (a.losses !== b.losses) return a.losses - b.losses;
+      const sa = sos(a), sb = sos(b);
+      if (sb !== sa) return sb - sa;
+      return a.name.localeCompare(b.name);
+    });
+
+    // Tenta evitar repetir confrontos
+    const used = new Set();
+    const pairs = [];
+
+    // Helper para achar o melhor adversário disponível
+    function pickOpponent(i) {
+      const A = ordered[i];
+      // tenta priorizar mesma pontuação (wins-losses)
+      const candidates = [];
+      for (let j=i+1; j<ordered.length; j++) {
+        const B = ordered[j];
+        if (used.has(B.id)) continue;
+        candidates.push(B);
+      }
+      // scoring: mesma bracket primeiro, depois evitar repetição, depois proximidade de desempenho, depois SoS
+      candidates.sort((b1, b2) => {
+        const s1 = pairScore(A, b1);
+        const s2 = pairScore(A, b2);
+        return s2 - s1;
+      });
+      return candidates[0] || null;
+    }
+
+    function pairScore(A, B) {
+      let score = 0;
+      const sameWL = (A.wins === B.wins && A.losses === B.losses);
+      const diff = Math.abs((A.wins - A.losses) - (B.wins - B.losses));
+      const already = A.opponents.includes(B.id);
+      if (sameWL) score += 100;
+      score += Math.max(0, 40 - diff*10);
+      if (!already) score += 60; else score -= 120;
+      // leve ajuste por SoS
+      score += Math.max(-10, Math.min(10, sos(B) - sos(A)));
+      return score;
+    }
+
+    for (let i=0; i<ordered.length; i++) {
+      const A = ordered[i];
+      if (used.has(A.id)) continue;
+
+      used.add(A.id);
+      const opp = pickOpponent(i);
+      if (opp) {
+        used.add(opp.id);
+        pairs.push({
+          id: uid(),
+          a: A.id,
+          b: opp.id,
+          format: isDecisive(A.id, opp.id) ? "BO3" : "BO1",
+          result: null
+        });
+      } else {
+        // BYE (caso ímpar)
+        pairs.push({
+          id: uid(),
+          a: A.id,
+          b: null,
+          format: "BO1",
+          result: null
+        });
+      }
+    }
+
+    return pairs;
+  }
+
+  // =========================
+  // Apply results
+  // =========================
+  function applyPairResult(pair, res) {
+    if (pair.result !== null) {
+      // Se já tinha resultado, desfaz antes (para permitir alterar)
+      rollbackPairResult(pair, pair.result);
+    }
+    pair.result = res;
+
+    const A = getDeck(pair.a);
+    const B = pair.b ? getDeck(pair.b) : null;
+
+    if (!A) return;
+
+    if (res === "BYE") {
+      A.wins += 1;
+      A.byeCount += 1;
+      clampStatus(A);
+      log(`BYE: ${A.name} recebe 1 vitória (agora ${A.wins}-${A.losses}).`);
+      save();
+      renderAll();
+      return;
+    }
+
+    if (!B) return;
+
+    // registra oponentes (1x)
+    if (!A.opponents.includes(B.id)) A.opponents.push(B.id);
+    if (!B.opponents.includes(A.id)) B.opponents.push(A.id);
+
+    if (res === "A") {
+      A.wins += 1;
+      B.losses += 1;
+      clampStatus(A); clampStatus(B);
+      log(`Resultado: ${A.name} venceu ${B.name} (${A.wins}-${A.losses} / ${B.wins}-${B.losses}).`);
+    } else if (res === "B") {
+      B.wins += 1;
+      A.losses += 1;
+      clampStatus(A); clampStatus(B);
+      log(`Resultado: ${B.name} venceu ${A.name} (${B.wins}-${B.losses} / ${A.wins}-${A.losses}).`);
+    }
+    save();
+    renderAll();
+  }
+
+  function rollbackPairResult(pair, res) {
+    // desfaz efeitos do res antigo
+    const A = getDeck(pair.a);
+    const B = pair.b ? getDeck(pair.b) : null;
+    if (!A) return;
+    if (res === "BYE") {
+      A.wins = Math.max(0, A.wins - 1);
+      A.byeCount = Math.max(0, A.byeCount - 1);
+      clampStatus(A);
+      return;
+    }
+    if (!B) return;
+
+    // desfaz W/L
+    if (res === "A") {
+      A.wins = Math.max(0, A.wins - 1);
+      B.losses = Math.max(0, B.losses - 1);
+    } else if (res === "B") {
+      B.wins = Math.max(0, B.wins - 1);
+      A.losses = Math.max(0, A.losses - 1);
+    }
+
+    // NÃO removo opponents no rollback (pra não quebrar SoS/agenda)
+    // mas isso só impacta se você ficar mudando resultados várias vezes;
+    // manter opponents é mais simples e OK pro escritório.
+    clampStatus(A); clampStatus(B);
+  }
+
+  // =========================
+  // Bracket
+  // =========================
+  function buildBracket() {
+    const size = parseInt(bracketSize.value, 10);
+    if (![4,8].includes(size)) return;
+
+    // Considera todos decks e pega os melhores
+    const ranked = sortedDecksForTable();
+    if (ranked.length < size) {
+      alert(`Você precisa de pelo menos ${size} decks cadastrados.`);
+      return;
+    }
+
+    const selected = ranked.slice(0, size);
+
+    // Se já tiver muita gente "active", ok. Se preferir só classificados, descomenta:
+    // const selected = ranked.filter(d => d.status === 'advanced').slice(0, size);
+
+    // Seeds: 1 vs N, 2 vs N-1...
+    const seeds = selected.map((d, idx) => ({ seed: idx+1, deckId: d.id }));
+    const firstRound = [];
+    for (let i=0; i<size/2; i++) {
+      const a = seeds[i];
+      const b = seeds[size-1-i];
+      firstRound.push({
+        id: uid(),
+        a: a.deckId,
+        b: b.deckId,
+        aSeed: a.seed,
+        bSeed: b.seed,
+        result: null // 'A'|'B'
+      });
+    }
+
+    state.bracket = {
+      size,
+      rounds: [
+        { name: "Quartas/ Semis (R1)", matches: firstRound },
+        // próximas rodadas serão preenchidas quando decidir vencedores
+      ]
+    };
+    save();
+    renderBracket();
+    log(`Chave montada: Top ${size}.`);
+  }
+
+  function bracketAdvance() {
+    const br = state.bracket;
+    if (!br) return;
+
+    // constrói próximas rodadas conforme vencedores
+    const rounds = br.rounds;
+    let current = rounds[rounds.length - 1];
+    if (!current) return;
+
+    if (!current.matches.every(m => m.result)) {
+      alert("Defina o vencedor de todas as partidas da rodada atual da chave.");
+      return;
+    }
+
+    // pega vencedores
+    const winners = current.matches.map(m => m.result === "A" ? m.a : m.b);
+    if (winners.length === 1) {
+      // acabou
+      return;
+    }
+
+    const nextMatches = [];
+    for (let i=0; i<winners.length; i += 2) {
+      nextMatches.push({
+        id: uid(),
+        a: winners[i],
+        b: winners[i+1],
+        aSeed: null,
+        bSeed: null,
+        result: null
+      });
+    }
+
+    const roundName =
+      winners.length === 2 ? "Final" :
+      winners.length === 4 ? "Semifinal" :
+      winners.length === 8 ? "Quartas" : `R${rounds.length+1}`;
+
+    rounds.push({ name: roundName, matches: nextMatches });
+    save();
+    renderBracket();
+  }
+
+  function setBracketResult(roundIdx, matchId, res) {
+    const br = state.bracket;
+    if (!br) return;
+    const r = br.rounds[roundIdx];
+    const m = r.matches.find(x => x.id === matchId);
+    if (!m) return;
+    m.result = res;
+    save();
+    renderBracket();
+  }
+
+  function simulateBracket() {
+    if (!state.bracket) {
+      buildBracket();
+      if (!state.bracket) return;
+    }
+    // simula rodada por rodada
+    while (true) {
+      const br = state.bracket;
+      const cur = br.rounds[br.rounds.length - 1];
+      // decide vencedores aleatórios para quem não tem
+      for (const m of cur.matches) {
+        if (!m.result) m.result = (Math.random() < 0.5 ? "A" : "B");
+      }
+      save();
+      renderBracket();
+      if (cur.matches.length === 1) break;
+      bracketAdvance();
+    }
+    const final = state.bracket.rounds[state.bracket.rounds.length - 1].matches[0];
+    const champId = final.result === "A" ? final.a : final.b;
+    const champ = getDeck(champId);
+    log(`Simulação da chave concluída. Campeão: ${champ ? champ.name : champId}.`);
+  }
+
+  // =========================
+  // UI rendering
+  // =========================
+  function renderKPIs() {
+    const act = state.decks.filter(d => d.status === "active").length;
+    const adv = state.decks.filter(d => d.status === "advanced").length;
+    const elim = state.decks.filter(d => d.status === "eliminated").length;
+    kRound.textContent = String(state.rounds.length);
+    kActive.textContent = String(act);
+    kAdv.textContent = String(adv);
+    kElim.textContent = String(elim);
+
+    const total = state.decks.length;
+    statusPill.className = "pill";
+    if (total === 0) {
+      statusPill.textContent = "Estado: vazio";
+    } else if (!canGenerateRound()) {
+      statusPill.textContent = `Estado: ${total} decks cadastrados (sem pareamento disponível)`;
+      statusPill.classList.add("warn");
+    } else {
+      statusPill.textContent = `Estado: ${total} decks cadastrados`;
+      statusPill.classList.add("good");
+    }
+  }
+
+  function renderDecksTable() {
+    decksTable.innerHTML = "";
+    const rows = sortedDecksForTable();
+    for (const d of rows) {
+      const tr = document.createElement("tr");
+
+      const stLabel =
+        d.status === "advanced" ? `<span class="pill good">Classificado</span>` :
+        d.status === "eliminated" ? `<span class="pill bad">Eliminado</span>` :
+        `<span class="pill">Ativo</span>`;
+
+      tr.innerHTML = `
+        <td>
+          <div><b>${escapeHtml(d.name)}</b></div>
+          <div class="small">SoS: ${sos(d)} · Oponentes: ${d.opponents.length} · BYE: ${d.byeCount}</div>
+        </td>
+        <td class="right"><b>${d.wins}-${d.losses}</b></td>
+        <td>${stLabel}</td>
+        <td class="right">
+          <button data-act="rename" data-id="${d.id}">Renomear</button>
+          <button class="danger" data-act="remove" data-id="${d.id}">Remover</button>
+        </td>
+      `;
+      decksTable.appendChild(tr);
+    }
+  }
+
+  function renderPairs() {
+    pairsWrap.innerHTML = "";
+    const r = lastRound();
+    if (!r) {
+      pairsWrap.innerHTML = `<div class="muted">Nenhuma rodada ainda. Cadastre os decks e clique em “Gerar próxima rodada”.</div>`;
+      return;
+    }
+
+    for (const p of r.pairs) {
+      const A = getDeck(p.a);
+      const B = p.b ? getDeck(p.b) : null;
+      const mdBadge = p.format === "BO3"
+        ? `<span class="badge bo3">BO3 (decisiva)</span>`
+        : `<span class="badge bo1">BO1</span>`;
+
+      const scoreLine = () => {
+        if (!A) return "";
+        if (!B) return `${A.wins}-${A.losses} vs BYE`;
+        return `${A.wins}-${A.losses} vs ${B.wins}-${B.losses}`;
+      };
+
+      const div = document.createElement("div");
+      div.className = "pair";
+      div.innerHTML = `
+        <div class="top">
+          <div class="names">
+            <b>${escapeHtml(A ? A.name : p.a)} ${B ? `vs ${escapeHtml(B.name)}` : " (BYE?)"}</b>
+            <span>${scoreLine()}</span>
+          </div>
+          <div class="controls">
+            ${mdBadge}
+            ${renderPairControls(p, A, B)}
+          </div>
+        </div>
+      `;
+      pairsWrap.appendChild(div);
+    }
+  }
+
+  function renderPairControls(p, A, B) {
+    const disabled = false;
+    if (!B) {
+      // bye control
+      const checked = p.result === "BYE";
+      return `
+        <button class="primary" data-pair="${p.id}" data-res="BYE" ${disabled ? "disabled":""}>
+          Marcar BYE (vitória)
+        </button>
+        <span class="muted">${checked ? "Resultado: BYE" : "Sem resultado"}</span>
+      `;
+    }
+    const aWin = p.result === "A";
+    const bWin = p.result === "B";
+    return `
+      <button class="${aWin ? "primary" : ""}" data-pair="${p.id}" data-res="A" ${disabled ? "disabled":""}>
+        ${escapeHtml(A ? A.name : "A")} venceu
+      </button>
+      <button class="${bWin ? "primary" : ""}" data-pair="${p.id}" data-res="B" ${disabled ? "disabled":""}>
+        ${escapeHtml(B ? B.name : "B")} venceu
+      </button>
+      <button data-pair="${p.id}" data-res="CLR" ${disabled ? "disabled":""}>Limpar</button>
+      <span class="muted">${p.result ? "Resultado definido" : "Sem resultado"}</span>
+    `;
+  }
+
+  function renderLog() {
+    logEl.textContent = state.log.slice().reverse().join("\n");
+  }
+
+  function renderBracket() {
+    bracketWrap.innerHTML = "";
+    const br = state.bracket;
+    if (!br) {
+      bracketWrap.innerHTML = `<div class="muted">Nenhuma chave montada ainda.</div>`;
+      return;
+    }
+
+    br.rounds.forEach((round, ri) => {
+      const card = document.createElement("div");
+      card.className = "match";
+      card.innerHTML = `<div class="row" style="justify-content:space-between; align-items:center;">
+          <b>${escapeHtml(round.name)}</b>
+          ${ri === br.rounds.length - 1 && round.matches.every(m => m.result) && round.matches.length > 1
+            ? `<button class="primary" data-br-advance="1">Avançar rodada</button>`
+            : ""
+          }
+        </div>
+        <div class="sep"></div>
+        <div class="grid" style="grid-template-columns:1fr; gap:8px;"></div>
+      `;
+      const inner = card.querySelector(".grid");
+
+      for (const m of round.matches) {
+        const A = getDeck(m.a);
+        const B = getDeck(m.b);
+
+        const aName = A ? A.name : m.a;
+        const bName = B ? B.name : m.b;
+
+        const aCls = m.result === "A" ? "winner" : (m.result === "B" ? "loser" : "");
+        const bCls = m.result === "B" ? "winner" : (m.result === "A" ? "loser" : "");
+
+        const line = document.createElement("div");
+        line.style.border = "1px solid #1f2a3b";
+        line.style.borderRadius = "12px";
+        line.style.padding = "10px";
+        line.innerHTML = `
+          <div class="row" style="justify-content:space-between; align-items:center;">
+            <div style="min-width:240px;">
+              <div class="small">BO3</div>
+              <div class="${aCls}"><b>${escapeHtml(aName)}</b></div>
+              <div class="${bCls}"><b>${escapeHtml(bName)}</b></div>
+            </div>
+            <div class="row" style="justify-content:flex-end;">
+              <button class="${m.result==='A'?'primary':''}" data-br-set="${ri}:${m.id}:A">A venceu</button>
+              <button class="${m.result==='B'?'primary':''}" data-br-set="${ri}:${m.id}:B">B venceu</button>
+              <button data-br-set="${ri}:${m.id}:CLR">Limpar</button>
+            </div>
+          </div>
+        `;
+        inner.appendChild(line);
+      }
+
+      bracketWrap.appendChild(card);
+    });
+
+    // Se final definida, mostra campeão
+    const last = br.rounds[br.rounds.length - 1];
+    if (last && last.matches.length === 1 && last.matches[0].result) {
+      const f = last.matches[0];
+      const champId = f.result === "A" ? f.a : f.b;
+      const champ = getDeck(champId);
+      const champCard = document.createElement("div");
+      champCard.className = "match";
+      champCard.innerHTML = `<b>Campeão</b>
+        <div class="sep"></div>
+        <div style="font-size:16px;" class="winner">${escapeHtml(champ ? champ.name : champId)}</div>
+      `;
+      bracketWrap.appendChild(champCard);
+    }
+  }
+
+  function renderAll() {
+    renderKPIs();
+    renderDecksTable();
+    renderPairs();
+    renderBracket();
+    renderLog();
+
+    btnNextRound.disabled = !canGenerateRound() || !currentRoundComplete();
+    btnUndoRound.disabled = state.rounds.length === 0;
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[s]));
+  }
+
+  // =========================
+  // Actions
+  // =========================
+  function addDeck(name) {
+    const n = name.trim();
+    if (!n) return;
+    state.decks.push({
+      id: uid(),
+      name: n,
+      wins: 0,
+      losses: 0,
+      status: "active",
+      opponents: [],
+      byeCount: 0
+    });
+    save();
+    log(`Deck adicionado: ${n}.`);
+    renderAll();
+  }
+
+  function removeDeck(id) {
+    const d = getDeck(id);
+    if (!d) return;
+    // Não deixa remover se já tem rodadas (pra não quebrar histórico)
+    if (state.rounds.length > 0) {
+      if (!confirm("Já existem rodadas registradas. Remover pode bagunçar o histórico. Remover mesmo assim?")) return;
+    }
+    state.decks = state.decks.filter(x => x.id !== id);
+    // limpa referências em opponents (opcional)
+    state.decks.forEach(x => x.opponents = x.opponents.filter(oid => oid !== id));
+    save();
+    log(`Deck removido: ${d.name}.`);
+    renderAll();
+  }
+
+  function renameDeck(id) {
+    const d = getDeck(id);
+    if (!d) return;
+    const n = prompt("Novo nome do deck:", d.name);
+    if (!n) return;
+    d.name = n.trim() || d.name;
+    save();
+    log(`Deck renomeado: ${d.name}.`);
+    renderAll();
+  }
+
+  function resetAll() {
+    if (!confirm("Resetar tudo? Isso apaga decks, rodadas e chave.")) return;
+    state = { decks: [], rounds: [], bracket: null, log: [] };
+    localStorage.removeItem(LS_KEY);
+    renderAll();
+  }
+
+  function seedExample20() {
+    if (state.decks.length > 0) {
+      if (!confirm("Já existem decks cadastrados. Adicionar os exemplos mesmo assim?")) return;
+    }
+    const examples = [
+      "Burn", "Izzet Spells", "Azorius Control", "Mono Green Stompy",
+      "Rakdos Midrange", "Elfos", "Bogles", "Tron", "Affinity", "Goblins",
+      "Dimir Faeries", "Boros Synth", "Jeskai Ephemerate", "Gruul Aggro",
+      "Orzhov Lifegain", "Selesnya Auras", "Storm", "Merfolk", "Reanimator", "Humans"
+    ];
+    examples.forEach(n => addDeck(n));
+  }
+
+  function nextRound() {
+    const pairs = makeSwissPairs();
+    if (!pairs) return;
+
+    const round = {
+      round: state.rounds.length + 1,
+      pairs,
+      createdAt: now()
+    };
+    state.rounds.push(round);
+    state.bracket = null; // opcional: reseta chave ao criar nova rodada
+    save();
+    log(`Rodada ${round.round} gerada com ${pairs.length} pareamentos.`);
+    renderAll();
+  }
+
+  function undoRound() {
+    const r = lastRound();
+    if (!r) return;
+    if (!confirm(`Desfazer rodada ${r.round}? Isso vai remover os resultados e tentar voltar o placar.`)) return;
+
+    // desfaz resultados (na ordem inversa) se existirem
+    for (const p of r.pairs) {
+      if (p.result !== null) {
+        rollbackPairResult(p, p.result);
+        p.result = null;
+      }
+    }
+    // remove rodada
+    state.rounds.pop();
+
+    // Recalcula status de todos
+    state.decks.forEach(d => clampStatus(d));
+
+    save();
+    log(`Rodada ${r.round} desfeita.`);
+    renderAll();
+  }
+
+  function applyAutoBye() {
+    const r = lastRound();
+    if (!r) return;
+    let count = 0;
+    for (const p of r.pairs) {
+      if (p.b === null && p.result === null) {
+        applyPairResult(p, "BYE");
+        count++;
+      }
+    }
+    if (count === 0) alert("Não há BYE pendente nesta rodada.");
+  }
+
+  // =========================
+  // Event listeners
+  // =========================
+  btnAddDeck.addEventListener("click", () => {
+    addDeck(deckName.value);
+    deckName.value = "";
+    deckName.focus();
+  });
+
+  deckName.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") btnAddDeck.click();
+  });
+
+  btnSeedExample.addEventListener("click", seedExample20);
+  btnResetAll.addEventListener("click", resetAll);
+
+  btnNextRound.addEventListener("click", nextRound);
+  btnUndoRound.addEventListener("click", undoRound);
+  btnAutoFinish.addEventListener("click", applyAutoBye);
+
+  // tabela ações
+  $("#decksTable").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    const id = btn.getAttribute("data-id");
+    const act = btn.getAttribute("data-act");
+    if (!id || !act) return;
+    if (act === "remove") removeDeck(id);
+    if (act === "rename") renameDeck(id);
+  });
+
+  // resultados da rodada
+  pairsWrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    const pairId = btn.getAttribute("data-pair");
+    const res = btn.getAttribute("data-res");
+    if (!pairId || !res) return;
+
+    const r = lastRound();
+    if (!r) return;
+    const p = r.pairs.find(x => x.id === pairId);
+    if (!p) return;
+
+    if (res === "CLR") {
+      if (p.result !== null) {
+        rollbackPairResult(p, p.result);
+        p.result = null;
+        // re-avalia formato (pode mudar ao voltar placar)
+        p.format = p.b ? (isDecisive(p.a, p.b) ? "BO3" : "BO1") : "BO1";
+        save();
+        log("Resultado limpo para um pareamento da rodada atual.");
+        renderAll();
+      }
+      return;
+    }
+
+    // Se é BYE mas tinha B, ignora
+    if (res === "BYE" && p.b !== null) return;
+
+    applyPairResult(p, res);
+
+    // Após aplicar, atualiza formato dos pares restantes (porque scores mudam e partidas decisivas podem surgir)
+    const rr = lastRound();
+    if (rr) {
+      for (const pp of rr.pairs) {
+        if (pp.result === null && pp.b) {
+          pp.format = isDecisive(pp.a, pp.b) ? "BO3" : "BO1";
+        }
+      }
+      save();
+      renderAll();
+    }
+  });
+
+  // Bracket
+  btnBuildBracket.addEventListener("click", buildBracket);
+  btnSimBracket.addEventListener("click", simulateBracket);
+
+  bracketWrap.addEventListener("click", (e) => {
+    const adv = e.target.closest("button[data-br-advance]");
+    if (adv) {
+      bracketAdvance();
+      return;
+    }
+    const b = e.target.closest("button[data-br-set]");
+    if (!b) return;
+    const [ri, mid, res] = b.getAttribute("data-br-set").split(":");
+    const roundIdx = parseInt(ri, 10);
+    if (res === "CLR") setBracketResult(roundIdx, mid, null);
+    else setBracketResult(roundIdx, mid, res);
+  });
+
+  // Export / Import
+  btnExport.addEventListener("click", () => {
+    jsonBox.value = JSON.stringify(state, null, 2);
+    jsonBox.focus();
+    jsonBox.select();
+    log("Export JSON gerado.");
+  });
+
+  btnImport.addEventListener("click", () => {
+    const txt = jsonBox.value.trim();
+    if (!txt) return alert("Cole um JSON no campo antes de importar.");
+    try {
+      const parsed = JSON.parse(txt);
+      // valida minimamente
+      if (!parsed || !Array.isArray(parsed.decks) || !Array.isArray(parsed.rounds)) {
+        return alert("JSON inválido (não parece ser deste app).");
+      }
+      state = parsed;
+      // garante defaults
+      state.log = Array.isArray(state.log) ? state.log : [];
+      state.bracket = state.bracket ?? null;
+      // clamp status
+      state.decks.forEach(d => {
+        d.opponents = Array.isArray(d.opponents) ? d.opponents : [];
+        d.byeCount = typeof d.byeCount === "number" ? d.byeCount : 0;
+        clampStatus(d);
+      });
+      save();
+      log("Import JSON aplicado.");
+      renderAll();
+    } catch (err) {
+      alert("Falha ao importar JSON: " + err.message);
+    }
+  });
+
+  // =========================
+  // Init
+  // =========================
+  // garante status coerente ao abrir
+  state.decks.forEach(clampStatus);
+  save();
+  renderAll();
+
+})();
+</script>
+
+<!--
+COMO RODAR LOCAL NA EMPRESA
+1) Salve este arquivo como "index.html" em uma pasta.
+2) Abra com duplo clique (Chrome/Edge/Firefox).
+3) Se quiser na rede/local com URL:
+   - No PC que vai "hospedar", abra terminal na pasta e rode:
+     python -m http.server 8080
+   - Em outro PC na rede, acesse: http://IP_DO_PC:8080/
+-->
+</body>
+</html>
