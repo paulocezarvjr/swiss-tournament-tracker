@@ -7,6 +7,7 @@
   // Storage + State
   // =========================
   const LS_KEY = "swiss_decks_3w3l_v1";
+  const FORMAT_KEY = "swiss_tournament_format_v1";
 
   /** @typedef {{
    *  id: string,
@@ -135,6 +136,23 @@
     '#818cf8', '#fb7185', '#4ade80', '#facc15', '#c084fc',
     '#14b8a6', '#3b82f6', '#ec4899', '#f59e0b', '#8b5cf6'
   ];
+
+  // Format Configuration Elements
+  const formatPreset = $("#formatPreset");
+  const winsNeeded = $("#winsNeeded");
+  const lossesNeeded = $("#lossesNeeded");
+  const normalFormat = $("#normalFormat");
+  const decisiveFormat = $("#decisiveFormat");
+  const btnApplyFormat = $("#btnApplyFormat");
+
+  // Tournament Format Configuration
+  const formatPresets = {
+    quick: { wins: 2, losses: 2, normal: 'BO1', decisive: 'BO3' },
+    standard: { wins: 3, losses: 3, normal: 'BO3', decisive: 'BO5' },
+    extended: { wins: 4, losses: 4, normal: 'BO3', decisive: 'BO5' }
+  };
+
+  let tournamentFormat = loadFormat();
   
   // Tournament archive elements
   const tournamentList = $("#tournamentList");
@@ -695,6 +713,78 @@
     }
   }
 
+  // =========================
+  // Format Configuration
+  // =========================
+  function loadFormat() {
+    try {
+      const raw = localStorage.getItem(FORMAT_KEY);
+      if (!raw) return formatPresets.standard;
+      return JSON.parse(raw);
+    } catch {
+      return formatPresets.standard;
+    }
+  }
+
+  function saveFormat(format) {
+    localStorage.setItem(FORMAT_KEY, JSON.stringify(format));
+    tournamentFormat = format;
+    updateFormatUI();
+    updateSubtitle();
+    toast('Tournament format updated', 'info');
+  }
+
+  function updateFormatUI() {
+    winsNeeded.value = tournamentFormat.wins;
+    lossesNeeded.value = tournamentFormat.losses;
+    normalFormat.value = tournamentFormat.normal;
+    decisiveFormat.value = tournamentFormat.decisive;
+
+    // Detect which preset matches current config
+    let matchedPreset = 'custom';
+    for (const [presetName, preset] of Object.entries(formatPresets)) {
+      if (preset.wins === tournamentFormat.wins &&
+          preset.losses === tournamentFormat.losses &&
+          preset.normal === tournamentFormat.normal &&
+          preset.decisive === tournamentFormat.decisive) {
+        matchedPreset = presetName;
+        break;
+      }
+    }
+    formatPreset.value = matchedPreset;
+  }
+
+  function applyFormatFromUI() {
+    const format = {
+      wins: parseInt(winsNeeded.value),
+      losses: parseInt(lossesNeeded.value),
+      normal: normalFormat.value,
+      decisive: decisiveFormat.value
+    };
+
+    // Validate
+    if (format.wins < 1 || format.wins > 10) {
+      toast('Wins must be between 1 and 10', 'error');
+      return;
+    }
+    if (format.losses < 1 || format.losses > 10) {
+      toast('Losses must be between 1 and 10', 'error');
+      return;
+    }
+
+    saveFormat(format);
+  }
+
+  function updateSubtitle() {
+    const subtitle = document.querySelector('.sub');
+    if (subtitle) {
+      subtitle.innerHTML = `
+        Deck advances with <b>${tournamentFormat.wins} wins</b>, is eliminated with <b>${tournamentFormat.losses} losses</b>. 
+        Normal matches are <b>${tournamentFormat.normal}</b>. Decisive matches are <b>${tournamentFormat.decisive}</b>.
+      `;
+    }
+  }
+
   function log(msg) {
     const stamp = new Date().toLocaleString("en-US");
     state.log.push(`[${stamp}] ${msg}`);
@@ -713,8 +803,8 @@
   // Deck Management
   // =========================
   function clampStatus(deck) {
-    if (deck.wins >= 3) deck.status = "advanced";
-    else if (deck.losses >= 3) deck.status = "eliminated";
+    if (deck.wins >= tournamentFormat.wins) deck.status = "advanced";
+    else if (deck.losses >= tournamentFormat.losses) deck.status = "eliminated";
     else deck.status = "active";
   }
 
@@ -775,8 +865,10 @@
     const da = getDeck(a);
     const db = b ? getDeck(b) : null;
     if (!da) return false;
-    const aDec = (da.wins === 2 || da.losses === 2);
-    const bDec = db ? (db.wins === 2 || db.losses === 2) : false;
+    const threshold = tournamentFormat.wins - 1;
+    const lossThreshold = tournamentFormat.losses - 1;
+    const aDec = (da.wins >= threshold || da.losses >= lossThreshold);
+    const bDec = db ? (db.wins >= threshold || db.losses >= lossThreshold) : false;
     return aDec || bDec;
   }
 
@@ -855,7 +947,7 @@
           id: uid(),
           a: A.id,
           b: opp.id,
-          format: isDecisive(A.id, opp.id) ? "BO5" : "BO3",
+          format: isDecisive(A.id, opp.id) ? tournamentFormat.decisive : tournamentFormat.normal,
           result: null
         });
       } else {
@@ -864,7 +956,7 @@
           id: uid(),
           a: A.id,
           b: null,
-          format: "BO3",
+          format: tournamentFormat.normal,
           result: null
         });
       }
@@ -2222,6 +2314,30 @@
     });
   });
 
+  // Format Configuration
+  formatPreset.addEventListener("change", () => {
+    const preset = formatPreset.value;
+    if (preset !== 'custom' && formatPresets[preset]) {
+      const config = formatPresets[preset];
+      winsNeeded.value = config.wins;
+      lossesNeeded.value = config.losses;
+      normalFormat.value = config.normal;
+      decisiveFormat.value = config.decisive;
+    }
+  });
+
+  // When manual fields change, set preset to custom
+  [winsNeeded, lossesNeeded, normalFormat, decisiveFormat].forEach(el => {
+    el.addEventListener("change", () => {
+      formatPreset.value = 'custom';
+    });
+  });
+
+  btnApplyFormat.addEventListener("click", () => {
+    buttonFeedback(btnApplyFormat, true);
+    applyFormatFromUI();
+  });
+
   // Analytics Fullscreen
   btnCloseAnalytics.addEventListener("click", closeAnalyticsFullscreen);
   
@@ -2287,7 +2403,7 @@
         buttonFeedback(btn, false);
         rollbackPairResult(p, p.result);
         p.result = null;
-        p.format = p.b ? (isDecisive(p.a, p.b) ? "BO5" : "BO3") : "BO3";
+        p.format = p.b ? (isDecisive(p.a, p.b) ? tournamentFormat.decisive : tournamentFormat.normal) : tournamentFormat.normal;
         save();
         log("Result cleared for a pairing in the current round.");
         renderAll();
@@ -2304,7 +2420,7 @@
     if (rr) {
       for (const pp of rr.pairs) {
         if (pp.result === null && pp.b) {
-          pp.format = isDecisive(pp.a, pp.b) ? "BO5" : "BO3";
+          pp.format = isDecisive(pp.a, pp.b) ? tournamentFormat.decisive : tournamentFormat.normal;
         }
       }
       save();
@@ -2468,6 +2584,8 @@
   // =========================
   // Initialize
   // =========================
+  updateFormatUI();
+  updateSubtitle();
   state.decks.forEach(clampStatus);
   save();
   renderAll();

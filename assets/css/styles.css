@@ -274,6 +274,23 @@ button.warn {
   background: rgba(251, 191, 36, .08);
 }
 
+/* Format Configuration */
+.format-config {
+  background: rgba(45, 212, 191, .05);
+  border: 1px solid rgba(45, 212, 191, .2);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.format-config input[type="number"] {
+  text-align: center;
+  font-weight: 600;
+}
+
+.format-config select option {
+  background: var(--bg);
+}
+
 /* Utility Classes */
 .muted {
   color: var(--muted);
