@@ -274,6 +274,50 @@ button.warn {
   background: rgba(251, 191, 36, .08);
 }
 
+/* Format Configuration */
+.format-config {
+  background: rgba(45, 212, 191, .05);
+  border: 1px solid rgba(45, 212, 191, .2);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  max-height: 300px;
+  opacity: 1;
+}
+
+.format-config.hidden {
+  max-height: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  opacity: 0;
+}
+
+.format-toggle-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+  background: rgba(45, 212, 191, .1);
+  border: 1px solid rgba(45, 212, 191, .3);
+  color: var(--good);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.format-toggle-btn:hover {
+  background: rgba(45, 212, 191, .2);
+  border-color: var(--good);
+}
+
+.format-config input[type="number"] {
+  text-align: center;
+  font-weight: 600;
+}
+
+.format-config select option {
+  background: var(--bg);
+}
+
 /* Utility Classes */
 .muted {
   color: var(--muted);

@@ -99,7 +99,58 @@
              TAB 1: TOURNAMENT
              ============================================ -->
         <div class="tab-pane active" id="tab-tournament">
-          <h2>Decks & Configuration</h2>
+          <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h2 style="margin: 0;">Tournament Format</h2>
+            <button id="btnToggleFormat" class="format-toggle-btn">⚙️ Settings</button>
+          </div>
+          
+          <div class="format-config hidden" id="formatConfigSection">
+            <div class="row" style="gap:12px; align-items:flex-end;">
+              <div style="flex:1;">
+                <label class="small">Preset</label>
+                <select id="formatPreset">
+                  <option value="quick">⚡ Quick (2W/2L)</option>
+                  <option value="standard" selected>🎯 Standard (3W/3L)</option>
+                  <option value="extended">🏆 Extended (4W/4L)</option>
+                  <option value="custom">⚙️ Custom</option>
+                </select>
+              </div>
+              <div style="width:100px;">
+                <label class="small">Wins to Advance</label>
+                <input type="number" id="winsNeeded" min="1" max="10" value="3" />
+              </div>
+              <div style="width:100px;">
+                <label class="small">Losses to Eliminate</label>
+                <input type="number" id="lossesNeeded" min="1" max="10" value="3" />
+              </div>
+            </div>
+            <div class="row" style="gap:12px; margin-top:12px; align-items:flex-end;">
+              <div style="flex:1;">
+                <label class="small">Normal Matches</label>
+                <select id="normalFormat">
+                  <option value="BO1">BO1 (Best of 1)</option>
+                  <option value="BO3" selected>BO3 (Best of 3)</option>
+                  <option value="BO5">BO5 (Best of 5)</option>
+                </select>
+              </div>
+              <div style="flex:1;">
+                <label class="small">Decisive Matches</label>
+                <select id="decisiveFormat">
+                  <option value="BO3">BO3 (Best of 3)</option>
+                  <option value="BO5" selected>BO5 (Best of 5)</option>
+                  <option value="BO7">BO7 (Best of 7)</option>
+                </select>
+              </div>
+              <button id="btnApplyFormat" class="primary">Apply Format</button>
+            </div>
+            <div class="hint" style="margin-top:8px;">
+              💡 Format applies to new tournaments. Current tournament keeps its format.
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <h2>Decks & Registration</h2>
 
           <div class="row" style="width:100%;">
             <div style="flex:1; min-width:240px;">
