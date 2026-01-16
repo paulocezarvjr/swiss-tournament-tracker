@@ -58,7 +58,7 @@ ifconfig | grep "inet " | grep -v 127.0.0.1
 http://YOUR-IP:8080
 ```
 
-📖 **See [NETWORK-GUIDE.md](NETWORK-GUIDE.md) for detailed instructions**
+📖 **See [NETWORK-GUIDE.md](docs/NETWORK-GUIDE.md) for detailed instructions**
 
 ### 🌐 GitHub Pages (Access from Anywhere)
 1. Push to GitHub
