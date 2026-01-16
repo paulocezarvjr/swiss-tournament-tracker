@@ -99,9 +99,12 @@
              TAB 1: TOURNAMENT
              ============================================ -->
         <div class="tab-pane active" id="tab-tournament">
-          <h2>Tournament Format</h2>
+          <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h2 style="margin: 0;">Tournament Format</h2>
+            <button id="btnToggleFormat" class="format-toggle-btn">⚙️ Settings</button>
+          </div>
           
-          <div class="format-config">
+          <div class="format-config hidden" id="formatConfigSection">
             <div class="row" style="gap:12px; align-items:flex-end;">
               <div style="flex:1;">
                 <label class="small">Preset</label>

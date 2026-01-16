@@ -144,6 +144,8 @@
   const normalFormat = $("#normalFormat");
   const decisiveFormat = $("#decisiveFormat");
   const btnApplyFormat = $("#btnApplyFormat");
+  const btnToggleFormat = $("#btnToggleFormat");
+  const formatConfigSection = $("#formatConfigSection");
 
   // Tournament Format Configuration
   const formatPresets = {
@@ -764,15 +766,32 @@
 
     // Validate
     if (format.wins < 1 || format.wins > 10) {
-      toast('Wins must be between 1 and 10', 'error');
+      showToast('Wins must be between 1 and 10', 'error');
       return;
     }
     if (format.losses < 1 || format.losses > 10) {
-      toast('Losses must be between 1 and 10', 'error');
+      showToast('Losses must be between 1 and 10', 'error');
       return;
     }
 
+    // Warn if tournament has already started
+    if (state.decks.length > 0 || state.rounds.length > 0) {
+      if (!confirm('⚠️ Tournament has already started!\n\nChanging the format will NOT affect the current tournament, but will apply to new tournaments or after a reset.\n\nContinue?')) {
+        return;
+      }
+    }
+
     saveFormat(format);
+    
+    // Hide config section after applying
+    formatConfigSection.classList.add('hidden');
+    showToast('✓ Format saved! Will apply to new tournaments.', 'success');
+  }
+
+  function toggleFormatConfig() {
+    formatConfigSection.classList.toggle('hidden');
+    const isHidden = formatConfigSection.classList.contains('hidden');
+    btnToggleFormat.textContent = isHidden ? '⚙️ Settings' : '✕ Close';
   }
 
   function updateSubtitle() {
@@ -2338,6 +2357,8 @@
     applyFormatFromUI();
   });
 
+  btnToggleFormat.addEventListener("click", toggleFormatConfig);
+
   // Analytics Fullscreen
   btnCloseAnalytics.addEventListener("click", closeAnalyticsFullscreen);
   
@@ -2591,5 +2612,10 @@
   renderAll();
   updateTimerDisplay();
   renderTournamentList();
+  
+  // Hide format config if tournament already started
+  if (state.decks.length > 0 || state.rounds.length > 0) {
+    formatConfigSection.classList.add('hidden');
+  }
 
 })();
