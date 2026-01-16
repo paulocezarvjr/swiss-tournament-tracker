@@ -163,7 +163,7 @@
 
           <h2>Decks & Registration</h2>
 
-          <div class="row" style="width:100%; gap:10px;">
+          <div class="row" style="width:100%; gap:10px; align-items:flex-end;">
             <div style="flex:1; min-width:240px;">
               <label class="small">Deck name</label>
               <input id="deckName" placeholder="E.g.: Burn Pauper / Azorius Control / Elves..." />
@@ -172,9 +172,7 @@
               <label class="small">Seed <span class="hint" style="font-size:10px;">(optional)</span></label>
               <input type="number" id="deckSeed" placeholder="1" min="1" max="999" />
             </div>
-            <div style="display:flex; gap:10px; align-items:flex-end;">
-              <button class="primary" id="btnAddDeck">Add deck</button>
-            </div>
+            <button class="primary" id="btnAddDeck">Add deck</button>
           </div>
 
           <div class="row" style="justify-content:flex-end; gap:8px; margin-top:8px;">
