@@ -12,6 +12,7 @@
   /** @typedef {{
    *  id: string,
    *  name: string,
+   *  seed: number|null,
    *  wins: number,
    *  losses: number,
    *  status: 'active'|'advanced'|'eliminated',
@@ -52,10 +53,14 @@
   const $ = (sel) => document.querySelector(sel);
 
   const deckName = $("#deckName");
+  const deckSeed = $("#deckSeed");
   const btnAddDeck = $("#btnAddDeck");
+  const btnAutoSeed = $("#btnAutoSeed");
+  const btnClearSeeds = $("#btnClearSeeds");
   const btnSeedExample = $("#btnSeedExample");
   const btnResetTournament = $("#btnResetTournament");
   const btnResetAll = $("#btnResetAll");
+  const seedHeader = $("#seedHeader");
 
   const btnNextRound = $("#btnNextRound");
   const btnUndoRound = $("#btnUndoRound");
@@ -146,12 +151,13 @@
   const btnApplyFormat = $("#btnApplyFormat");
   const btnToggleFormat = $("#btnToggleFormat");
   const formatConfigSection = $("#formatConfigSection");
+  const useSeedingCheckbox = $("#useSeedingCheckbox");
 
   // Tournament Format Configuration
   const formatPresets = {
-    quick: { wins: 2, losses: 2, normal: 'BO1', decisive: 'BO3' },
-    standard: { wins: 3, losses: 3, normal: 'BO3', decisive: 'BO5' },
-    extended: { wins: 4, losses: 4, normal: 'BO3', decisive: 'BO5' }
+    quick: { wins: 2, losses: 2, normal: 'BO1', decisive: 'BO3', useSeeding: false },
+    standard: { wins: 3, losses: 3, normal: 'BO3', decisive: 'BO5', useSeeding: false },
+    extended: { wins: 4, losses: 4, normal: 'BO3', decisive: 'BO5', useSeeding: false }
   };
 
   let tournamentFormat = loadFormat();
@@ -709,7 +715,18 @@
     try {
       const raw = localStorage.getItem(LS_KEY);
       if (!raw) return null;
-      return JSON.parse(raw);
+      const data = JSON.parse(raw);
+      
+      // Backwards compatibility: ensure all decks have seed field
+      if (data && data.decks) {
+        data.decks.forEach(d => {
+          if (d.seed === undefined) {
+            d.seed = null;
+          }
+        });
+      }
+      
+      return data;
     } catch {
       return null;
     }
@@ -721,10 +738,15 @@
   function loadFormat() {
     try {
       const raw = localStorage.getItem(FORMAT_KEY);
-      if (!raw) return formatPresets.standard;
-      return JSON.parse(raw);
+      if (!raw) return { ...formatPresets.standard };
+      const format = JSON.parse(raw);
+      // Ensure useSeeding exists (for backwards compatibility)
+      if (format.useSeeding === undefined) {
+        format.useSeeding = false;
+      }
+      return format;
     } catch {
-      return formatPresets.standard;
+      return { ...formatPresets.standard };
     }
   }
 
@@ -741,6 +763,7 @@
     lossesNeeded.value = tournamentFormat.losses;
     normalFormat.value = tournamentFormat.normal;
     decisiveFormat.value = tournamentFormat.decisive;
+    useSeedingCheckbox.checked = tournamentFormat.useSeeding || false;
 
     // Detect which preset matches current config
     let matchedPreset = 'custom';
@@ -754,6 +777,9 @@
       }
     }
     formatPreset.value = matchedPreset;
+    
+    // Show/hide seed column in table
+    updateSeedColumnVisibility();
   }
 
   function applyFormatFromUI() {
@@ -761,7 +787,8 @@
       wins: parseInt(winsNeeded.value),
       losses: parseInt(lossesNeeded.value),
       normal: normalFormat.value,
-      decisive: decisiveFormat.value
+      decisive: decisiveFormat.value,
+      useSeeding: useSeedingCheckbox.checked
     };
 
     // Validate
@@ -907,6 +934,7 @@
     }
 
     const isFirstRound = state.rounds.length === 0;
+    const useSeeding = tournamentFormat.useSeeding;
 
     // Sort by performance and SoS for stability
     let ordered = [...act].sort((a, b) => {
@@ -917,14 +945,69 @@
       return a.name.localeCompare(b.name);
     });
 
-    // Randomize first round for variety
+    // First round logic
     if (isFirstRound) {
-      ordered = shuffleArray(ordered);
-      log("Round 1: Decks randomized for pairing variety.");
+      if (useSeeding) {
+        // Sort by seed (unseeded decks go to the end)
+        ordered = [...act].sort((a, b) => {
+          const aSeed = a.seed !== null && a.seed !== undefined ? a.seed : 9999;
+          const bSeed = b.seed !== null && b.seed !== undefined ? b.seed : 9999;
+          return aSeed - bSeed;
+        });
+        log("Round 1: Seeded pairing (#1 vs #N, #2 vs #N-1, etc.)");
+      } else {
+        ordered = shuffleArray(ordered);
+        log("Round 1: Decks randomized for pairing variety.");
+      }
+    } else if (useSeeding) {
+      // Later rounds with seeding: within same score, consider seed
+      ordered = [...act].sort((a, b) => {
+        // First by performance
+        if (b.wins !== a.wins) return b.wins - a.wins;
+        if (a.losses !== b.losses) return a.losses - b.losses;
+        // Then by seed (lower seed = higher priority)
+        const aSeed = a.seed !== null && a.seed !== undefined ? a.seed : 9999;
+        const bSeed = b.seed !== null && b.seed !== undefined ? b.seed : 9999;
+        if (aSeed !== bSeed) return aSeed - bSeed;
+        // Finally by SoS
+        const sa = sos(a), sb = sos(b);
+        if (sb !== sa) return sb - sa;
+        return a.name.localeCompare(b.name);
+      });
     }
 
     const used = new Set();
     const pairs = [];
+
+    // For seeded Round 1: use simple high vs low pairing
+    if (isFirstRound && useSeeding) {
+      const N = ordered.length;
+      for (let i = 0; i < Math.floor(N / 2); i++) {
+        const high = ordered[i];
+        const low = ordered[N - 1 - i];
+        pairs.push({
+          id: uid(),
+          a: high.id,
+          b: low.id,
+          format: isDecisive(high.id, low.id) ? tournamentFormat.decisive : tournamentFormat.normal,
+          result: null
+        });
+        used.add(high.id);
+        used.add(low.id);
+      }
+      // Handle odd number (BYE)
+      if (N % 2 === 1) {
+        const bye = ordered[Math.floor(N / 2)];
+        pairs.push({
+          id: uid(),
+          a: bye.id,
+          b: null,
+          format: tournamentFormat.normal,
+          result: null
+        });
+      }
+      return pairs;
+    }
 
     function pickOpponent(i) {
       const A = ordered[i];
@@ -1228,6 +1311,9 @@
   function renderDecksTable() {
     decksTable.innerHTML = "";
     const rows = sortedDecksForTable();
+    const hasSeeds = state.decks.some(d => d.seed !== null && d.seed !== undefined);
+    const showSeeds = hasSeeds || tournamentFormat.useSeeding;
+    
     for (const d of rows) {
       const tr = document.createElement("tr");
 
@@ -1237,7 +1323,12 @@
         `<span class="pill">Active</span>`;
 
       const stats = calculateStats(d);
+      const seedCell = showSeeds 
+        ? `<td style="text-align:center; font-weight:600; color:var(--good);">${d.seed ? `#${d.seed}` : '—'}</td>` 
+        : '';
+      
       tr.innerHTML = `
+        ${seedCell}
         <td>
           <div style="display: flex; align-items: center; gap: 8px;">
             <b>${escapeHtml(d.name)}</b>
@@ -2148,14 +2239,88 @@
   }
 
   // =========================
+  // Seeding Functions
+  // =========================
+  function updateSeedColumnVisibility() {
+    const hasSeeds = state.decks.some(d => d.seed !== null && d.seed !== undefined);
+    const useSeeding = tournamentFormat.useSeeding;
+    const shouldShow = hasSeeds || useSeeding;
+    
+    if (seedHeader) {
+      seedHeader.style.display = shouldShow ? '' : 'none';
+    }
+  }
+
+  function autoSeedDecks() {
+    if (state.decks.length === 0) {
+      showToast('No decks to seed', 'info');
+      return;
+    }
+    
+    if (state.rounds.length > 0) {
+      if (!confirm('⚠️ Tournament has already started!\n\nAuto-seeding will assign seeds based on current order but won\'t affect existing pairings.\n\nContinue?')) {
+        return;
+      }
+    }
+    
+    // Sort by current order (as they appear in the array)
+    state.decks.forEach((d, index) => {
+      d.seed = index + 1;
+    });
+    
+    save();
+    log(`Auto-seeded ${state.decks.length} decks by registration order.`);
+    showToast(`✓ Auto-seeded ${state.decks.length} decks`, 'success');
+    renderAll();
+  }
+
+  function clearSeeds() {
+    const hasSeeds = state.decks.some(d => d.seed !== null && d.seed !== undefined);
+    if (!hasSeeds) {
+      showToast('No seeds to clear', 'info');
+      return;
+    }
+    
+    if (!confirm('Clear all seed numbers?')) {
+      return;
+    }
+    
+    state.decks.forEach(d => {
+      d.seed = null;
+    });
+    
+    save();
+    log('Cleared all seeds.');
+    showToast('✓ All seeds cleared', 'success');
+    renderAll();
+  }
+
+  // =========================
   // Actions
   // =========================
-  function addDeck(name) {
+  function addDeck(name, seed = null) {
     const n = name.trim();
     if (!n) return;
+    
+    // Validate seed if provided
+    if (seed !== null) {
+      seed = parseInt(seed);
+      if (isNaN(seed) || seed < 1) {
+        seed = null;
+      } else {
+        // Check for duplicate seed
+        const existingSeed = state.decks.find(d => d.seed === seed);
+        if (existingSeed) {
+          showToast(`⚠️ Seed ${seed} already exists for "${existingSeed.name}"`, 'warning');
+          return;
+        }
+      }
+    }
+    
     state.decks.push({
       id: uid(),
       name: n,
+      seed: seed,
       wins: 0,
       losses: 0,
       status: "active",
@@ -2163,8 +2328,9 @@
       byeCount: 0
     });
     save();
-    log(`Deck added: ${n}.`);
-    showToast(`✓ Deck added: ${n}`, 'success');
+    const seedInfo = seed ? ` (Seed #${seed})` : '';
+    log(`Deck added: ${n}${seedInfo}.`);
+    showToast(`✓ Deck added: ${n}${seedInfo}`, 'success');
     renderAll();
   }
 
@@ -2250,6 +2416,7 @@
       state.decks.push({
         id: uid(),
         name: n,
+        seed: null,
         wins: 0,
         losses: 0,
         status: "active",
@@ -2358,6 +2525,11 @@
   });
 
   btnToggleFormat.addEventListener("click", toggleFormatConfig);
+  
+  // Update seed column visibility when useSeeding checkbox changes
+  useSeedingCheckbox.addEventListener("change", () => {
+    formatPreset.value = 'custom';
+  });
 
   // Analytics Fullscreen
   btnCloseAnalytics.addEventListener("click", closeAnalyticsFullscreen);
@@ -2379,8 +2551,10 @@
   btnAddDeck.addEventListener("click", () => {
     if (deckName.value.trim()) {
       buttonFeedback(btnAddDeck, true);
-      addDeck(deckName.value);
+      const seed = deckSeed.value ? parseInt(deckSeed.value) : null;
+      addDeck(deckName.value, seed);
       deckName.value = "";
+      deckSeed.value = "";
       deckName.focus();
     }
   });
@@ -2388,6 +2562,9 @@
   deckName.addEventListener("keydown", (e) => {
     if (e.key === "Enter") btnAddDeck.click();
   });
+
+  btnAutoSeed.addEventListener("click", autoSeedDecks);
+  btnClearSeeds.addEventListener("click", clearSeeds);
 
   btnSeedExample.addEventListener("click", seedExample20);
   btnResetTournament.addEventListener("click", resetTournament);
