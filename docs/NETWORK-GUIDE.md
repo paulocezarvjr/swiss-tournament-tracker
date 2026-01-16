@@ -5,8 +5,8 @@
 ### **Use the Auto Script:**
 
 ```bash
-cd /Users/paulo-olibra/swiss
-./start-server.sh
+# From the project root directory
+./scripts/start-server.sh
 ```
 
 O script vai:
@@ -20,11 +20,11 @@ O script vai:
 🏆 Swiss Tournament Tracker - Network Server
 ===========================================
 
-📡 Your local IP address: 192.168.1.5
+📡 Your local IP address: 192.168.X.X
 
 🌐 Access from other devices on the same network:
 
-   http://192.168.1.5:8080
+   http://192.168.X.X:8080
 
 📱 On your phone/tablet, open browser and type the URL above
 
@@ -40,8 +40,8 @@ O script vai:
 ### **Method 1: Python (Built-in no Mac)**
 
 ```bash
-# 1. Abrir Terminal
-cd /Users/paulo-olibra/swiss
+# 1. Abrir Terminal (navigate to project folder)
+cd /path/to/swiss-tournament-tracker
 
 # 2. Iniciar servidor
 python3 -m http.server 8080
@@ -59,7 +59,8 @@ ifconfig | grep "inet " | grep -v 127.0.0.1
 Se você tem Node.js instalado:
 
 ```bash
-cd /Users/paulo-olibra/swiss
+# Navigate to project folder
+cd /path/to/swiss-tournament-tracker
 
 # Opção A: usando npx (sem instalar)
 npx serve -p 8080
@@ -75,7 +76,8 @@ npx http-server -p 8080
 Se você tem PHP instalado:
 
 ```bash
-cd /Users/paulo-olibra/swiss
+# Navigate to project folder
+cd /path/to/swiss-tournament-tracker
 php -S 0.0.0.0:8080
 ```
 
@@ -124,9 +126,9 @@ hostname -I
 
 ### **Passo 3:** Digite a URL:
 ```
-http://192.168.1.5:8080
+http://YOUR-IP-ADDRESS:8080
 ```
-*(substitua pelo SEU IP)*
+*(use the IP address from step 1)*
 
 ### **Passo 4:** Pronto! 🎉
 
@@ -161,7 +163,7 @@ Ou adicionar exceção para Python na porta 8080.
 
 ### **Cenário 1: Torneio no Escritório**
 1. Host roda o servidor no seu Mac
-2. Compartilha URL: `http://192.168.0.100:8080`
+2. Compartilha URL: `http://192.168.X.X:8080`
 3. Todos acessam nos navegadores
 4. Cada um vê o estado atual
 5. **Importante:** Apenas o host pode editar (localStorage local)
@@ -211,7 +213,7 @@ brew install tmux
 tmux new -s swiss
 
 # Rodar servidor
-cd /Users/paulo-olibra/swiss
+cd /path/to/swiss-tournament-tracker
 python3 -m http.server 8080
 
 # Detach: Ctrl+B, depois D
@@ -281,8 +283,8 @@ ifconfig | grep "inet "
 
 **Check 5:** Porta correta?
 ```
-http://192.168.1.5:8080
-                   ^^^^ - não esquecer :8080
+http://YOUR-IP:8080
+              ^^^^ - não esquecer :8080
 ```
 
 ### **❌ Connection Refused**
@@ -357,9 +359,9 @@ ngrok http 8080
 
 ### **Para Rede Local (LAN):**
 ```bash
-cd /Users/paulo-olibra/swiss
-./start-server.sh
-# Acessar http://SEU-IP:8080 do celular
+# From the project root directory
+./scripts/start-server.sh
+# Acessar http://YOUR-IP:8080 do celular
 ```
 
 ### **Para Internet (Mundo todo):**
