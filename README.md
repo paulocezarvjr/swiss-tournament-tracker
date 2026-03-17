@@ -11,21 +11,25 @@
 ### Swiss Rounds View
 
 ![Swiss Rounds View](./assets/images/swiss-rounds-view.png)
+
 _Automated pairing system with intelligent tiebreakers and BYE handling_
 
 ### Analytics Dashboard
 
 ![Analytics Dashboard](./assets/images/analytics.png)
+
 _Interactive charts with deck filtering and customizable colors_
 
 ### Playoff Bracket
 
 ![Playoff Bracket](./assets/images/playoff.png)
+
 _Top 4/8 playoff brackets with performance-based seeding_
 
 ### Mobile View
 
 ![Mobile View](./assets/images/mobile-view.png)
+
 _Fully responsive design works perfectly on any device_
 
 ## ✨ Why Swiss Tournament Tracker?
