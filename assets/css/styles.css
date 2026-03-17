@@ -6,12 +6,58 @@
 :root {
   --bg: #0b0f14;
   --card: #121824;
-  --muted: #9fb0c0;
+  --card-inner: #1a2235;
   --text: #e9f1f8;
+  --text-bright: #ffffff;
+  --muted: #9fb0c0;
   --line: #233041;
   --good: #2dd4bf;
   --bad: #fb7185;
   --warn: #fbbf24;
+  --header-bg: rgba(11,15,20,.92);
+  --surface: rgba(255,255,255,.04);
+  --btn-bg: #0e1730;
+  --pill-good-text: #bff7ee;
+  --pill-bad-text: #ffd2da;
+  --pill-warn-text: #ffe7b0;
+  --badge-bo3-text: #bfdbfe;
+  --badge-bo5-text: #ffe7b0;
+}
+
+[data-theme="light"] {
+  --bg: #faf9f7;
+  --card: #ffffff;
+  --card-inner: #fdf8f4;
+  --text: #1c1917;
+  --text-bright: #1c1917;
+  --muted: #78716c;
+  --line: #e8e0d8;
+  --good: #0f766e;
+  --bad: #be123c;
+  --warn: #b45309;
+  --header-bg: rgba(250,249,247,.92);
+  --surface: rgba(0,0,0,.04);
+  --btn-bg: #f0ece6;
+  --pill-good-text: #ffffff;
+  --pill-bad-text: #ffffff;
+  --pill-warn-text: #ffffff;
+  --badge-bo3-text: #ffffff;
+  --badge-bo5-text: #ffffff;
+}
+
+/* Theme transition */
+*, *::before, *::after {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+/* Exempt animated selectors from theme transition */
+button.success-flash,
+button.clicked,
+.timer-display.expired,
+.toast,
+.toast.toast-hiding,
+.save-indicator .spinner {
+  transition: none;
 }
 
 /* Reset */
@@ -22,7 +68,7 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  background: linear-gradient(180deg, #0b0f14, #0a0d12);
+  background: var(--bg);
   color: var(--text);
 }
 
@@ -32,7 +78,7 @@ header {
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
-  background: rgba(11, 15, 20, .92);
+  background: var(--header-bg);
   backdrop-filter: blur(10px);
   z-index: 10;
 }
@@ -84,14 +130,14 @@ main {
 .card h2 {
   margin: 0 0 14px;
   font-size: 16px;
-  color: #d6e5f3;
+  color: var(--text);
   font-weight: 600;
 }
 
 .card h3 {
   margin: 0 0 10px;
   font-size: 14px;
-  color: #d6e5f3;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -101,7 +147,7 @@ main {
 
 .tabs-nav {
   display: flex;
-  background: rgba(0, 0, 0, .2);
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
   padding: 0;
 }
@@ -125,8 +171,8 @@ main {
 }
 
 .tab-btn:hover {
-  background: rgba(255, 255, 255, .03);
-  color: #fff;
+  background: var(--surface);
+  color: var(--text-bright);
 }
 
 .tab-btn.active {
@@ -183,8 +229,8 @@ main {
 input, button, select, textarea {
   font: inherit;
   color: var(--text);
-  background: #0b1220;
-  border: 1px solid #263449;
+  background: var(--card-inner);
+  border: 1px solid var(--line);
   border-radius: 10px;
   padding: 9px 10px;
 }
@@ -196,14 +242,14 @@ input:focus, select:focus, textarea:focus {
 
 button {
   cursor: pointer;
-  background: #0e1730;
+  background: var(--btn-bg);
   white-space: nowrap;
   min-width: fit-content;
   font-size: 13px;
 }
 
 button:hover {
-  border-color: #3b536e;
+  border-color: var(--line);
 }
 
 /* Removed - using .pair .pair-footer button now */
@@ -237,19 +283,19 @@ button.warn {
 
 .pill.good {
   border-color: rgba(45, 212, 191, .55);
-  color: #bff7ee;
+  color: var(--pill-good-text);
   background: rgba(45, 212, 191, .08);
 }
 
 .pill.bad {
   border-color: rgba(251, 113, 133, .5);
-  color: #ffd2da;
+  color: var(--pill-bad-text);
   background: rgba(251, 113, 133, .08);
 }
 
 .pill.warn {
   border-color: rgba(251, 191, 36, .55);
-  color: #ffe7b0;
+  color: var(--pill-warn-text);
   background: rgba(251, 191, 36, .08);
 }
 
@@ -264,13 +310,13 @@ button.warn {
 
 .badge.bo3 {
   border-color: rgba(96, 165, 250, .55);
-  color: #bfdbfe;
+  color: var(--badge-bo3-text);
   background: rgba(96, 165, 250, .08);
 }
 
 .badge.bo5 {
   border-color: rgba(251, 191, 36, .55);
-  color: #ffe7b0;
+  color: var(--badge-bo5-text);
   background: rgba(251, 191, 36, .08);
 }
 
@@ -352,7 +398,7 @@ table {
 }
 
 th, td {
-  border-bottom: 1px solid #1c2736;
+  border-bottom: 1px solid var(--line);
   padding: 9px 8px;
   vertical-align: top;
   text-align: left;
@@ -380,10 +426,10 @@ td {
    ============================================ */
 
 .pair {
-  border: 1px solid #1f2a3b;
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .01));
+  background: var(--surface);
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -399,8 +445,8 @@ td {
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px;
-  background: rgba(255, 255, 255, .02);
-  border-bottom: 1px solid rgba(255, 255, 255, .05);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
 }
 
 .pair .score-line {
@@ -426,8 +472,8 @@ td {
   flex-direction: column;
   gap: 8px;
   padding: 16px;
-  background: rgba(255, 255, 255, .03);
-  border: 2px solid rgba(255, 255, 255, .1);
+  background: var(--surface);
+  border: 2px solid var(--line);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -436,7 +482,7 @@ td {
 }
 
 .pair .deck-item:not(:disabled):hover {
-  background: rgba(255, 255, 255, .06);
+  background: var(--card-inner);
   border-color: rgba(45, 212, 191, .4);
   transform: translateY(-2px);
 }
@@ -447,7 +493,7 @@ td {
 }
 
 .pair .deck-item.bye-placeholder {
-  background: rgba(255, 255, 255, .01);
+  background: var(--surface);
   border-style: dashed;
 }
 
@@ -463,7 +509,7 @@ td {
   font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
-  color: #fff;
+  color: var(--text-bright);
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -517,7 +563,7 @@ td {
   gap: 8px;
   padding: 12px 16px;
   background: rgba(0, 0, 0, .15);
-  border-top: 1px solid rgba(255, 255, 255, .05);
+  border-top: 1px solid var(--line);
   align-items: center;
 }
 
@@ -531,7 +577,7 @@ td {
   font-size: 11px;
   padding: 4px 12px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, .15);
+  border: 1px solid var(--line);
   color: var(--muted);
   border-radius: 6px;
   cursor: pointer;
@@ -539,9 +585,9 @@ td {
 }
 
 .pair .clear-btn:hover {
-  background: rgba(255, 100, 100, .1);
-  border-color: rgba(255, 100, 100, .5);
-  color: rgb(255, 120, 120);
+  background: rgba(190, 18, 60, .1);
+  border-color: var(--bad);
+  color: var(--bad);
 }
 
 /* Mobile adjustments */
@@ -598,7 +644,7 @@ td {
   padding: 8px 10px;
   border-radius: 12px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, .02);
+  background: var(--surface);
 }
 
 .k .n {
@@ -797,12 +843,12 @@ td {
 
 /* Legacy styles for compatibility */
 .winner {
-  color: #bff7ee;
+  color: var(--pill-good-text);
   font-weight: 700;
 }
 
 .loser {
-  color: #ffd2da;
+  color: var(--pill-bad-text);
 }
 
 /* Log */
@@ -830,7 +876,7 @@ td {
 }
 
 .chart-card {
-  background: rgba(255, 255, 255, .02);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 16px;
@@ -866,14 +912,14 @@ td {
   gap: 12px;
   align-items: center;
   padding: 12px;
-  background: rgba(255, 255, 255, .03);
-  border: 1px solid rgba(255, 255, 255, .08);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 10px;
   transition: all 0.2s ease;
 }
 
 .leaderboard-item:hover {
-  background: rgba(255, 255, 255, .06);
+  background: var(--card-inner);
   transform: translateX(4px);
 }
 
@@ -900,7 +946,7 @@ td {
 .leaderboard-name {
   font-size: 14px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-bright);
 }
 
 .leaderboard-stat {
@@ -957,7 +1003,7 @@ td {
 .analytics-title h1 {
   margin: 0;
   font-size: 28px;
-  color: #fff;
+  color: var(--text-bright);
   font-weight: 700;
 }
 
@@ -973,7 +1019,7 @@ td {
   font-weight: 600;
   background: rgba(248, 113, 113, .2);
   border: 1px solid rgba(248, 113, 113, .5);
-  color: #f87171;
+  color: var(--bad);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -994,7 +1040,7 @@ td {
 .analytics-controls h3 {
   margin: 0 0 16px;
   font-size: 16px;
-  color: #d6e5f3;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -1013,8 +1059,8 @@ td {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: rgba(255, 255, 255, .05);
-  border: 2px solid rgba(255, 255, 255, .15);
+  background: var(--surface);
+  border: 2px solid var(--line);
   border-radius: 24px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1022,7 +1068,7 @@ td {
 }
 
 .deck-chip:hover {
-  background: rgba(255, 255, 255, .08);
+  background: var(--card-inner);
   transform: translateY(-2px);
 }
 
@@ -1035,13 +1081,13 @@ td {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: 2px solid var(--text-bright);
 }
 
 .deck-chip-name {
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-bright);
 }
 
 .deck-chip-stats {
@@ -1061,7 +1107,7 @@ td {
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #d6e5f3;
+  color: var(--text);
   cursor: pointer;
   user-select: none;
 }
@@ -1092,7 +1138,7 @@ td {
 .chart-large h2 {
   margin: 0 0 20px;
   font-size: 20px;
-  color: #fff;
+  color: var(--text-bright);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -1178,7 +1224,7 @@ td {
 .tool-section {
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: rgba(255, 255, 255, .02);
+  background: var(--surface);
   overflow: hidden;
 }
 
@@ -1186,7 +1232,7 @@ td {
   padding: 14px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: #d6e5f3;
+  color: var(--text);
   cursor: pointer;
   user-select: none;
   display: flex;
@@ -1196,7 +1242,7 @@ td {
 }
 
 .tool-section summary:hover {
-  background: rgba(255, 255, 255, .04);
+  background: var(--surface);
 }
 
 .tool-section[open] summary {
@@ -1217,7 +1263,7 @@ td {
   font-size: 36px;
   font-weight: 700;
   text-align: center;
-  color: #fff;
+  color: var(--text-bright);
   padding: 20px;
   background: rgba(0, 0, 0, .2);
   border-radius: 10px;
@@ -1604,7 +1650,7 @@ button.success-flash {
   align-items: center;
   padding: 8px 12px;
   margin: 6px 0;
-  background: rgba(255, 255, 255, .02);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 10px;
   font-size: 13px;
@@ -1639,7 +1685,7 @@ button.success-flash {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: rgba(255, 255, 255, .02);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
   cursor: pointer;
@@ -1647,7 +1693,7 @@ button.success-flash {
 }
 
 .tournament-item:hover {
-  background: rgba(255, 255, 255, .05);
+  background: var(--card-inner);
   border-color: var(--good);
 }
 
@@ -1899,6 +1945,29 @@ body.presentation-mode td {
 
 body.presentation-mode .timer-display {
   font-size: 72px;
+}
+
+/* Light-mode pill/badge solid backgrounds */
+[data-theme="light"] .pill.good { background: var(--good); border-color: var(--good); }
+[data-theme="light"] .pill.bad  { background: var(--bad);  border-color: var(--bad); }
+[data-theme="light"] .pill.warn { background: var(--warn); border-color: var(--warn); }
+[data-theme="light"] .badge.bo3 { background: rgba(59,130,246,.85); border-color: rgba(59,130,246,.85); }
+[data-theme="light"] .badge.bo5 { background: rgba(180,83,9,.85); border-color: rgba(180,83,9,.85); }
+
+/* Theme toggle button */
+.theme-toggle-btn {
+  right: 60px;
+}
+
+@media (max-width: 768px) {
+  .theme-toggle-btn {
+    right: 50px;
+    top: 60px;
+  }
+}
+
+body.presentation-mode #btnTheme {
+  display: none;
 }
 
 .presentation-toggle {
