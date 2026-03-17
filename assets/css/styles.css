@@ -1954,15 +1954,16 @@ body.presentation-mode .timer-display {
 [data-theme="light"] .badge.bo3 { background: rgba(59,130,246,.85); border-color: rgba(59,130,246,.85); }
 [data-theme="light"] .badge.bo5 { background: rgba(180,83,9,.85); border-color: rgba(180,83,9,.85); }
 
-/* Theme toggle button */
+/* Theme toggle button — stacked below presentation toggle */
 .theme-toggle-btn {
-  right: 60px;
+  top: 122px;
+  right: 20px;
 }
 
 @media (max-width: 768px) {
   .theme-toggle-btn {
-    right: 50px;
-    top: 60px;
+    top: 112px;
+    right: 10px;
   }
 }
 
