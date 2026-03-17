@@ -20,7 +20,7 @@ _Interactive charts with deck filtering and customizable colors_
 
 ### Playoff Bracket
 
-![Playoff Bracket](./assets/images/playoff-bracket.png)
+![Playoff Bracket](./assets/images/playoff.png)
 _Top 4/8 playoff brackets with performance-based seeding_
 
 ### Mobile View
