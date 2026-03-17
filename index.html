@@ -4,6 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Swiss Tournament Tracker (3W/3L)</title>
+  <script>
+    (function(){
+      var t = localStorage.getItem('swiss_theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    })();
+  </script>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -370,6 +377,9 @@
   <div class="spinner"></div>
   <span class="text">Saving...</span>
 </div>
+
+<!-- Theme Toggle -->
+<button id="btnTheme" class="theme-toggle-btn" title="Toggle theme" aria-label="Toggle light/dark theme">🌙</button>
 
 <!-- Presentation Mode Toggle -->
 <div class="presentation-toggle" id="presentationToggle">

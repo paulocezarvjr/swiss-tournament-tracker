@@ -176,6 +176,36 @@
   const presentationText = $("#presentationText");
 
   // =========================
+  // Theme Toggle
+  // =========================
+  const THEME_KEY = 'swiss_theme';
+  const btnTheme = $('#btnTheme');
+
+  function applyTheme(theme) {
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      btnTheme.textContent = '☀️';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      btnTheme.textContent = '🌙';
+    }
+    localStorage.setItem(THEME_KEY, theme);
+  }
+
+  // Sync button icon with whatever the anti-flash script already applied
+  (function initThemeIcon() {
+    const active = document.documentElement.getAttribute('data-theme');
+    if (btnTheme) btnTheme.textContent = active === 'light' ? '☀️' : '🌙';
+  })();
+
+  if (btnTheme) {
+    btnTheme.addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      applyTheme(isLight ? 'dark' : 'light');
+    });
+  }
+
+  // =========================
   // Toast Notifications
   // =========================
   function showToast(message, type = 'info', duration = 3000) {
