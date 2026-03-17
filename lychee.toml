@@ -1,0 +1,19 @@
+# Lychee link checker configuration
+# https://github.com/lycheeverse/lychee
+
+# Accept 200 OK and 429 Too Many Requests (rate-limited CDNs/shields.io)
+accept = [200, 429]
+
+# Exclude directories that are not part of the deployable site
+exclude_path = [
+  "backup",
+  ".superpowers",
+  ".github",
+]
+
+# Exclude localhost references (used in docs for network setup examples)
+exclude = [
+  "http://localhost",
+  "http://127.0.0.1",
+  "http://192.168",
+]

@@ -192,7 +192,7 @@ npx serve -p 8080
 ## 🚀 Next Steps
 
 1. ✅ Read full [FEATURES.md](FEATURES.md) for detailed documentation
-2. ✅ Check [README.md](README.md) for technical details
+2. ✅ Check [README.md](../README.md) for technical details
 3. ✅ Start running tournaments!
 
 ---

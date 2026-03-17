@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Repo hygiene guard
+        run: |
+          FAILED=0
+          if [ -f package.json ]; then
+            echo "❌ package.json found — this project is intentionally dependency-free. Remove it."
+            FAILED=1
+          fi
+          if [ -f package-lock.json ]; then
+            echo "❌ package-lock.json found — this project is intentionally dependency-free. Remove it."
+            FAILED=1
+          fi
+          if [ -d node_modules ]; then
+            echo "❌ node_modules/ found — this project is intentionally dependency-free. Remove it."
+            FAILED=1
+          fi
+          if [ $FAILED -ne 0 ]; then exit 1; fi
+          echo "✅ No Node dependencies found."
+
+      - name: HTML5 validation
+        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
+        with:
+          root: .
+          blacklist: backup .superpowers .github
+
+      - name: Link checker
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config lychee.toml --verbose --no-progress './**/*.md' './**/*.html'
+          fail: true
