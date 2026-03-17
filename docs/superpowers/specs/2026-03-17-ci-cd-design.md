@@ -17,7 +17,9 @@ The project is intentionally dependency-free (no `package.json`). All CI checks 
 
 ## Workflow 1: `ci.yml`
 
-**Trigger:** `push` and `pull_request` on all branches.
+**Trigger:** `pull_request` on all branches; `push` on `main` only (avoids duplicate runs on PR branches).
+
+**Concurrency:** Cancel in-progress runs for the same branch when a new push supersedes them. Set `timeout-minutes: 10` on the job.
 
 ### Steps (in order)
 
@@ -30,14 +32,18 @@ The project is intentionally dependency-free (no `package.json`). All CI checks 
    Purpose: prevents contributors from silently introducing Node dependencies into a zero-dependency project.
 
 2. **HTML5 validation**
-   Uses a W3C-compatible HTML validator GitHub Action (e.g. `Cyb3r-Jak3/html5validator-action` or equivalent).
-   Validates `index.html`.
+   Uses `Cyb3r-Jak3/html5validator-action@v1.0.3`.
+   Validates all `.html` files under the repository root, excluding `backup/` and hidden directories (`.superpowers/`, `.github/`).
    Fails the check if any errors are reported.
 
 3. **Link checker**
-   Uses `lycheeverse/lychee-action` to scan all `.html` and `.md` files for broken URLs.
-   External links are checked; localhost/relative links are excluded.
-   Fails on broken links; a `lychee.toml` config file excludes known false positives if needed.
+   Uses `lycheeverse/lychee-action@v2` to scan all `.html` and `.md` files for broken external URLs.
+   A `lychee.toml` config file at the repo root explicitly excludes `backup/`, `.superpowers/`, and `.github/` directories, sets `localhost` as an ignored host, and sets `accept = [200, 429]` so rate-limited responses from external hosts do not cause false failures.
+   Fails on broken links.
+
+### Repository settings required
+
+- Enable branch protection on `main` with the `ci` workflow set as a required status check. Without this rule, the CI badge is informational only and does not block merging.
 
 ---
 
@@ -45,16 +51,21 @@ The project is intentionally dependency-free (no `package.json`). All CI checks 
 
 **Trigger:** `push` to `main` branch only.
 
+**Concurrency:** Cancel in-progress deploys for the same branch when a new push supersedes them. This ensures the latest commit is always what goes live and prevents stale deploys racing ahead.
+
 ### Steps (in order)
 
 1. **Checkout** repository
-2. **Deploy to GitHub Pages** using `actions/deploy-pages` (or the standard `actions/configure-pages` + `actions/upload-pages-artifact` + `actions/deploy-pages` sequence).
-   Serves the repository root as the static site.
+2. **Configure Pages** using `actions/configure-pages`
+3. **Upload artifact** using `actions/upload-pages-artifact` with the repository root as the upload path
+4. **Deploy to GitHub Pages** using `actions/deploy-pages`
+
+Serves the repository root as the static site.
 
 ### Repository settings required
 
 - GitHub Pages must be enabled on the repository, set to deploy from GitHub Actions (not from a branch).
-- The `GITHUB_TOKEN` permissions need `pages: write` and `id-token: write`.
+- The `GITHUB_TOKEN` permissions need `pages: write`, `id-token: write`, and `contents: read`.
 
 ---
 
@@ -65,7 +76,7 @@ The project is intentionally dependency-free (no `package.json`). All CI checks 
   workflows/
     ci.yml
     deploy.yml
-lychee.toml          # link checker config (optional, for exclusions)
+lychee.toml          # link checker config — excludes backup/, .superpowers/, localhost; accept 200+429
 ```
 
 ---
