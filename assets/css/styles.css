@@ -1954,15 +1954,15 @@ body.presentation-mode .timer-display {
 [data-theme="light"] .badge.bo3 { background: rgba(59,130,246,.85); border-color: rgba(59,130,246,.85); }
 [data-theme="light"] .badge.bo5 { background: rgba(180,83,9,.85); border-color: rgba(180,83,9,.85); }
 
-/* Theme toggle button — stacked below presentation toggle */
+/* Theme toggle button — top right, presentation mode moved to bottom left */
 .theme-toggle-btn {
-  top: 122px;
+  top: 70px;
   right: 20px;
 }
 
 @media (max-width: 768px) {
   .theme-toggle-btn {
-    top: 112px;
+    top: 60px;
     right: 10px;
   }
 }
@@ -1973,8 +1973,8 @@ body.presentation-mode #btnTheme {
 
 .presentation-toggle {
   position: fixed;
-  top: 70px;
-  right: 20px;
+  bottom: 20px;
+  left: 20px;
   z-index: 999;
   background: var(--card);
   border: 1px solid var(--line);
@@ -2094,8 +2094,10 @@ body.presentation-mode .bracket-nav-current {
   }
   
   .presentation-toggle {
-    right: 10px;
-    top: 60px;
+    bottom: 14px;
+    left: 14px;
+    right: auto;
+    top: auto;
     font-size: 11px;
     padding: 8px 12px;
   }
