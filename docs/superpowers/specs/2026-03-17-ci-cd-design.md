@@ -7,9 +7,10 @@
 
 ## Overview
 
-Add two GitHub Actions workflow files to the Swiss Tournament Tracker repository:
-- `ci.yml` — quality gate that runs on every PR and push
-- `deploy.yml` — auto-deploy to GitHub Pages on merge to `main`
+Add one GitHub Actions workflow file to the Swiss Tournament Tracker repository:
+- `ci.yml` — quality gate that runs on every PR and push to `main`
+
+Deployment is handled by GitHub Pages legacy mode (serves directly from `main` branch, no build step required). A separate `deploy.yml` is unnecessary and would conflict with the existing Pages configuration.
 
 The project is intentionally dependency-free (no `package.json`). All CI checks must run without npm.
 
@@ -47,35 +48,12 @@ The project is intentionally dependency-free (no `package.json`). All CI checks 
 
 ---
 
-## Workflow 2: `deploy.yml`
-
-**Trigger:** `push` to `main` branch only.
-
-**Concurrency:** Cancel in-progress deploys for the same branch when a new push supersedes them. This ensures the latest commit is always what goes live and prevents stale deploys racing ahead.
-
-### Steps (in order)
-
-1. **Checkout** repository
-2. **Configure Pages** using `actions/configure-pages`
-3. **Upload artifact** using `actions/upload-pages-artifact` with the repository root as the upload path
-4. **Deploy to GitHub Pages** using `actions/deploy-pages`
-
-Serves the repository root as the static site.
-
-### Repository settings required
-
-- GitHub Pages must be enabled on the repository, set to deploy from GitHub Actions (not from a branch).
-- The `GITHUB_TOKEN` permissions need `pages: write`, `id-token: write`, and `contents: read`.
-
----
-
 ## File layout
 
 ```
 .github/
   workflows/
     ci.yml
-    deploy.yml
 lychee.toml          # link checker config — excludes backup/, .superpowers/, localhost; accept 200+429
 ```
 
@@ -87,8 +65,6 @@ lychee.toml          # link checker config — excludes backup/, .superpowers/, 
 - [ ] Introducing `package.json` in a PR causes CI to fail with a clear message
 - [ ] Invalid HTML in `index.html` causes CI to fail
 - [ ] A broken external link in any `.html` or `.md` file causes CI to fail
-- [ ] Merging to `main` automatically triggers a GitHub Pages deployment
-- [ ] The deployed site is accessible at the repository's GitHub Pages URL
 - [ ] No `package.json`, `node_modules/`, or npm-related files are added to the repo
 
 ---
