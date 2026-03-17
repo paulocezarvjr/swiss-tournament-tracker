@@ -6,6 +6,28 @@
 ![Version](https://img.shields.io/badge/version-2.0-green.svg)
 ![Browser](https://img.shields.io/badge/platform-web-orange.svg)
 
+## 📸 Screenshots
+
+### Swiss Rounds View
+
+![Swiss Rounds View](./assets/images/swiss-rounds-view.png)
+_Automated pairing system with intelligent tiebreakers and BYE handling_
+
+### Analytics Dashboard
+
+![Analytics Dashboard](./assets/images/analytics.png)
+_Interactive charts with deck filtering and customizable colors_
+
+### Playoff Bracket
+
+![Playoff Bracket](./assets/images/playoff-bracket.png)
+_Top 4/8 playoff brackets with performance-based seeding_
+
+### Mobile View
+
+![Mobile View](./assets/images/mobile-view.png)
+_Fully responsive design works perfectly on any device_
+
 ## ✨ Why Swiss Tournament Tracker?
 
 **Zero Setup Required** • **Works Offline** • **No Account Needed** • **100% Free**
@@ -27,24 +49,28 @@ Double-click index.html
 ## 🎯 Core Features
 
 ### Tournament Management
+
 - **Swiss Pairing Algorithm** with intelligent tiebreakers (Strength of Schedule)
 - **Configurable Format**: Choose wins/losses needed and match formats (BO1/BO3/BO5/BO7)
 - **Automatic BYE Handling** for odd player counts
 - **Top 4/8 Playoff Brackets** with performance-based seeding
 
 ### Real-Time Tracking
+
 - **Interactive Match Cards**: Click to record winners
 - **Live Statistics**: Win rates, head-to-head records, opponent strength
 - **Round Timer** with customizable presets and audio alerts
 - **Auto-Save**: All data persists automatically in your browser
 
 ### Professional Features
+
 - **📊 Interactive Analytics**: Full-screen charts with deck filtering and custom colors
 - **📜 Round History**: Navigate and review all previous rounds
 - **🏆 Tournament Archive**: Save, load, and compare multiple tournaments
 - **🖥️ Presentation Mode**: Optimized for projectors and large displays
 
 ### Data Management
+
 - **Export/Import**: JSON backup with timestamps
 - **Tournament Comparison**: Analyze performance across events
 - **Reset Options**: Clear rounds while keeping participants
@@ -52,6 +78,7 @@ Double-click index.html
 ## 📱 Multi-Device Support
 
 Access from **any device** on your network:
+
 - 🖥️ Desktop/Laptop (tournament organizer)
 - 📱 Phone/Tablet (viewing live standings)
 - 📺 TV/Projector (presentation mode)
@@ -106,4 +133,4 @@ This project is actively maintained. For issues, feature requests, or contributi
 
 **Built with ❤️ for the tournament community**
 
-*Compatible with Chrome, Firefox, Safari, and Edge • No installation required*
+_Compatible with Chrome, Firefox, Safari, and Edge • No installation required_
