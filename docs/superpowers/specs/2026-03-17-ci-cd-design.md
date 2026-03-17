@@ -32,7 +32,7 @@ The project is intentionally dependency-free (no `package.json`). All CI checks 
    Purpose: prevents contributors from silently introducing Node dependencies into a zero-dependency project.
 
 2. **HTML5 validation**
-   Uses `Cyb3r-Jak3/html5validator-action@v1.0.3`.
+   Uses `Cyb3r-Jak3/html5validator-action@v7.2.0` with the `blacklist` input.
    Validates all `.html` files under the repository root, excluding `backup/` and hidden directories (`.superpowers/`, `.github/`).
    Fails the check if any errors are reported.
 
